@@ -10,16 +10,16 @@
    на 17 марта. Два «подгоночных» перевода в накопления выводятся решателем
    так, чтобы сойтись с контрольными точками выписки:
      · 273 384.31 — opening balance выписки на 15 апреля
-     · 284 647.22 — текущий остаток на 13 августа
+     · 284 647.22 — текущий остаток на 14 августа
    ========================================================================= */
 (function (global) {
   'use strict';
 
-  var TODAY = new Date(2026, 7, 13, 16, 51);   // 13 August 2026
+  var TODAY = new Date(2026, 7, 14, 16, 51);   // 14 August 2026
   var PERIOD_START = new Date(2026, 2, 17);    // 17 March 2026
   var OPENING = 228821.19;                     // остаток на начало периода
   var ANCHOR_APR15 = 273384.31;                // контрольная точка из выписки
-  var TARGET_CLOSING = 284647.22;              // текущий остаток
+  var TARGET_CLOSING = 284647.22;              // текущий остаток на 14 августа
 
   var BANK = {
     name: 'Discovery Bank',
@@ -318,18 +318,19 @@
   /* ================================================================= */
 
   add(at(2026, 7, 1, 'EFT'), 'EFT', '', 'Rent - Boksburgirene', -4990.00, 'home', { note: 'Monthly rent' });
-  add(at(2026, 7, 3, 'POS Purchase'), 'POS Purchase', '2740', 'Zama Resort Koh Pha', -285.40, 'dining');
-  add(at(2026, 7, 5, 'POS Purchase'), 'POS Purchase', '2740', '7 11 Chaweng Samui', -160.85, 'groceries');
+  add(at(2026, 7, 3, 'Online'), 'Online', '9441', 'Takealot.com', -285.40, 'shopping');
+  add(at(2026, 7, 5, 'Online'), 'Online', '9441', 'Apple Services', -160.85, 'entertain');
   add(at(2026, 7, 7, 'Fee'), 'Fee', '', 'Monthly Account Fee', -285.00, 'fees');
   add(at(2026, 7, 7, 'Fee'), 'Fee', '', 'Service Fees', -425.00, 'fees');
-  add(at(2026, 7, 9, 'POS Purchase'), 'POS Purchase', '2740', "Lotus'S 6447 Koh Ph", -612.30, 'groceries');
+  add(at(2026, 7, 9, 'Online'), 'Online', '2740', 'Superbalist Online', -612.30, 'shopping');
   add(at(2026, 7, 11, 'Online'), 'Online', '9441', 'Netflix Za', -99.00, 'entertain');
-  add(at(2026, 7, 12, 'EFT'), 'EFT', '', 'International Cash 12250.00 Samui', -6318.47, 'cash');
+  add(at(2026, 7, 12, 'Transfer'), 'Transfer', '', 'Payment to A Botha', -6318.47, 'transfers',
+    { to: '19004552718' });
   add(new Date(2026, 7, 13, 7, 22), 'EFT', '', 'Inward SWIFT RO26Kt3Vd80 Wise Payments', 28717.18, 'income',
     { from: 'Wise Payments' });
 
   /* подгоночный перевод в накопления — считается решателем ниже */
-  var closingTx = add(new Date(2026, 7, 13, 9, 40), 'Transfer', '', 'Savings For 90 Days',
+  var closingTx = add(new Date(2026, 7, 14, 9, 40), 'Transfer', '', 'Savings For 90 Days',
     -1, 'savings', { to: ACC_SAVINGS });
 
   /* ================================================================= */

@@ -137,11 +137,12 @@
   function plastic(acc, big) {
     var cls = 'plastic' + (acc.art === 'dark' ? ' plastic--dark' : acc.art === 'vault' ? ' plastic--vault' : '') + (big ? ' plastic--big' : '');
     return '<div class="' + cls + '">' +
-      '<div class="plastic__top">' + icon('mark') +
+      '<div class="plastic__top">' +
+        '<img class="plastic__logo" src="assets/brand/logo-card.png" alt="">' +
         '<span class="plastic__brand"><b>Discovery</b><i>Bank</i></span></div>' +
       '<span class="plastic__wave">' + icon('wave', { w: 1.8 }) + '</span>' +
       '<div class="plastic__chip"></div>' +
-      '<div class="plastic__mark">' + icon('mark') + '</div>' +
+      '<div class="plastic__mark"><img src="assets/brand/logo-card.png" alt=""></div>' +
       (big && acc.pan ? '<div class="plastic__pan">' + esc(acc.pan) + '</div>' : '') +
       '<div class="plastic__foot">' +
         '<span class="plastic__tier">' + esc(acc.tier.toUpperCase()) + '</span>' +
@@ -721,8 +722,8 @@
   function dPlain(dt) { return dt.getDate() + ' ' + MONTHS[dt.getMonth()] + ' ' + dt.getFullYear(); }
 
   function docLogo() {
-    return '<div class="st__logo">' + icon('markSolid') +
-      '<span><b>Discovery</b><i>Bank</i></span></div>';
+    return '<div class="st__logo">' +
+      '<img src="assets/brand/logo-statement.png" alt="Discovery Bank"></div>';
   }
 
   function renderDoc(p) {
@@ -817,7 +818,7 @@
       '<div class="st__foot">' +
         '<div>' + esc(DB.BANK.address) + ' | ' + esc(DB.BANK.support) + '</div>' +
         '<p>' + esc(DB.BANK.legalLine) + '</p>' +
-        '<span class="st__seal">' + icon('mark') + '</span>' +
+        '<span class="st__seal">' + icon('markSolid') + '</span>' +
       '</div>';
 
     var bar = '<div class="docbar">' +

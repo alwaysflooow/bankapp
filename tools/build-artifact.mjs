@@ -21,11 +21,21 @@ const css = read('assets/styles.css')
   .replace("url('fonts/open-sans.woff2')", `url(data:font/woff2;base64,${fontB64})`);
 const js = ['assets/icons.js', 'assets/data.js', 'assets/app.js'].map(read).join('\n');
 
-const out =
+// картинки бренда вшиваем в разметку: одиночный файл не может ходить за
+// соседними папками
+const brand = fs.readdirSync(path.join(root, 'assets/brand'))
+  .filter((f) => f.endsWith('.png'));
+
+const out0 =
   '<title>Discovery Bank</title>\n' +
   '<style>\n' + css + '\n</style>\n' +
   body.replace(/\s*<script src="[^"]+"><\/script>/g, '').trim() + '\n' +
   '<script>\n' + js + '\n</script>\n';
+
+const out = brand.reduce((acc, f) => {
+  const b64 = fs.readFileSync(path.join(root, 'assets/brand', f)).toString('base64');
+  return acc.split('assets/brand/' + f).join('data:image/png;base64,' + b64);
+}, out0);
 
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'dist/discovery-bank.html'), out);
