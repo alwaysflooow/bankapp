@@ -28,7 +28,9 @@
   --navy-deep:    #0E3D6D;
   --navy-soft:    #EAF1F8;
   --link:         #1C6BB0;
-  --credit:       #0D7A62;
+  /* дебет в референсе — красный с минусом после числа; кредит остаётся
+     обычными чернилами, поэтому отдельной «зелёной» краски нет */
+  --debit:        #D5203C;
 
   /* сцена «Momentum Money» */
   --bronze-1: #A9603A;
@@ -83,7 +85,7 @@ h1,h2,h3,p{ margin:0; }
 .acard__body,.acard__name,.acard__type,.acard__amt,.acard__lbl,
 .row__body,.row__label,.row__sub,.row__meta,
 .hello__name,.hello__sub,
-.tx__body,.tx__name,.tx__meta,.tx__amt,.tx__bal,
+.tx__body,.tx__name,.tx__meta,.tx__amt,
 .picker__body,.picker__t,.picker__s,
 .check__t,.check__s,
 .summary__lbl,.summary__val,
@@ -137,6 +139,17 @@ h1,h2,h3,p{ margin:0; }
   .stage{ padding:0; gap:0; min-height:100dvh; }
   .device{ max-width:none; height:100dvh; border-radius:0; box-shadow:none; }
   .stage__hint{ display:none; }
+}
+
+/* Запущено с домашнего экрана: рамка телефона не нужна, статус-бар рисует
+   система, снизу и сверху учитываем вырезы. */
+@media (display-mode:standalone), (display-mode:fullscreen){
+  .stage{ padding:0; gap:0; min-height:100dvh; background:var(--surface); }
+  .device{ max-width:none; width:100%; height:100dvh; border-radius:0; box-shadow:none; }
+  .stage__hint{ display:none; }
+  .statusbar{ display:none; }
+  .phone{ padding-top:env(safe-area-inset-top); }
+  .tabbar{ padding-bottom:calc(8px + env(safe-area-inset-bottom)); }
 }
 
 /* ---------- 5. Статус-бар ------------------------------------------------ */
@@ -567,36 +580,37 @@ h1,h2,h3,p{ margin:0; }
 .summary__lbl{ font-size:12.5px; color:var(--ink-3); }
 .summary__val{ font-size:17px; font-weight:600; letter-spacing:-.25px; margin-top:2px; }
 
+/* Лента операций собрана по эталону: заголовок дня — обычный текст без
+   линейки, строки разделяет воздух, кружок иконки — тонкая кромка мадженты,
+   мета идёт столбиком (тип / счета / категория), сумма прижата к первой строке. */
 .daylabel{
-  position:sticky; top:0; z-index:2;
-  padding:9px 20px 7px;
+  padding:20px 20px 8px;
   background:var(--surface);
-  font-size:13px; font-weight:600; color:var(--ink-2); letter-spacing:-.05px;
-  border-bottom:1px solid var(--line);
+  font-size:15px; line-height:20px; font-weight:450; color:var(--ink); letter-spacing:-.1px;
 }
 .tx{
-  position:relative; width:100%;
-  padding:11px 20px; display:flex; align-items:center; gap:13px; text-align:left;
+  width:100%;
+  padding:10px 20px 14px; display:flex; align-items:flex-start; gap:14px; text-align:left;
   transition:background .14s ease;
 }
 .tx:active{ background:var(--surface-2); }
-.tx + .tx::before{
-  content:""; position:absolute; left:73px; right:20px; top:0; height:1px; background:var(--line);
-}
 .tx__ic{
-  flex:0 0 40px; width:40px; height:40px; border-radius:50%;
-  display:grid; place-items:center; background:var(--surface-2); color:var(--ink-2);
+  flex:0 0 44px; width:44px; height:44px; border-radius:50%;
+  display:grid; place-items:center;
+  border:1.5px solid var(--magenta); color:var(--magenta);
 }
-.tx__ic svg{ width:20px; height:20px; }
+.tx__ic svg{ width:21px; height:21px; }
 .tx__body{ flex:1 1 auto; min-width:0; }
 .tx__name{
-  font-size:15.5px; line-height:21px; font-weight:500; letter-spacing:-.1px;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-size:16px; line-height:22px; font-weight:550; letter-spacing:-.1px;
+  overflow-wrap:anywhere;
 }
-.tx__meta{ font-size:12.5px; line-height:17px; color:var(--ink-3); margin-top:1px; }
-.tx__amt{ flex:0 0 auto; text-align:right; font-size:15.5px; font-weight:600; letter-spacing:-.2px; }
-.tx__amt--in{ color:var(--credit); }
-.tx__bal{ font-size:12px; color:var(--ink-4); font-weight:450; margin-top:1px; }
+.tx__meta{ font-size:13px; line-height:19px; color:var(--ink-3); }
+.tx__amt{
+  flex:0 0 auto; padding-top:1px; text-align:right;
+  font-size:16px; line-height:22px; font-weight:600; letter-spacing:-.2px;
+}
+.tx__amt--out{ color:var(--debit); }
 
 .empty{ padding:48px 32px; text-align:center; color:var(--ink-3); }
 .empty svg{ width:40px; height:40px; margin:0 auto 12px; color:var(--ink-4); }
@@ -705,7 +719,7 @@ h1,h2,h3,p{ margin:0; }
 .doc__table th:first-child, .doc__table td:first-child{ padding-left:22px; }
 .doc__table th:last-child, .doc__table td:last-child{ padding-right:22px; text-align:right; }
 .doc__table td.r{ text-align:right; white-space:nowrap; }
-.doc__table td.in{ color:var(--credit); }
+.doc__table td.r{ font-variant-numeric:tabular-nums; }
 .doc__tot{
   margin:14px 22px 0; padding:12px 14px; border-radius:var(--r-md); background:var(--surface-2);
 }

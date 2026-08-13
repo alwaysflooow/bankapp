@@ -1,7 +1,7 @@
 /* =========================================================================
-   Meridian Bank — логика макета.
-   Рендер строками, один делегированный обработчик, переходы между экранами
-   через клоны .screen. Никаких зависимостей.
+   Meridian Bank — mockup logic.
+   String templates for rendering, one delegated click handler, screen
+   transitions via cloned .screen nodes. No dependencies.
    ========================================================================= */
 (function () {
   'use strict';
@@ -13,7 +13,7 @@
 
   var STORE_KEY = 'meridian-mock-v1';
 
-  /* ---------------------------------------------------------------- 1. Состояние */
+  /* ---------------------------------------------------------------- 1. State */
   var S = {
     screen: 'login',
     params: {},
@@ -44,7 +44,7 @@
         authed: S.authed, hide: S.hide, frozen: S.frozen,
         requests: S.requests, screen: S.authed ? S.screen : 'login'
       }));
-    } catch (e) { /* приватный режим — просто не сохраняем */ }
+    } catch (e) { /* private mode — nothing to persist */ }
   }
 
   function load() {
@@ -62,13 +62,14 @@
         if (r.status === 'processing') r.status = 'ready';
         return r;
       });
-    } catch (e) { /* повреждённое хранилище игнорируем */ }
+    } catch (e) { /* corrupted storage is ignored */ }
   }
 
-  /* ---------------------------------------------------------------- 2. Утилиты */
-  var MON_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-  var MON_NOM = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-  var MON_SHORT = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+  /* ---------------------------------------------------------------- 2. Helpers */
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+  var MON_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -76,33 +77,26 @@
     });
   }
 
+  /* Формат сумм как в референсе: минус идёт после числа, дебет — красным. */
   function amount(v) {
-    var n = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return (v < 0 ? '-' : '') + 'R ' + n;
+    return 'R ' + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
+  function amountSigned(v) { return amount(v) + (v < 0 ? '-' : ''); }
   function money(v, force) { return (S.hide && !force) ? '••••••' : amount(v); }
-  function signed(v) { return (v > 0 ? '+' : '') + amount(v); }
+  function moneySigned(v, force) { return (S.hide && !force) ? '••••••' : amountSigned(v); }
 
-  function dLong(dt) { return dt.getDate() + ' ' + MON_GEN[dt.getMonth()] + ' ' + dt.getFullYear(); }
-  function dShort(dt) { return dt.getDate() + ' ' + MON_SHORT[dt.getMonth()]; }
-  function dNum(dt) {
-    return String(dt.getDate()).padStart(2, '0') + '.' + String(dt.getMonth() + 1).padStart(2, '0') + '.' + dt.getFullYear();
-  }
-  function tTime(dt) { return String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0'); }
-  function sameDay(a, b) { return a.toDateString() === b.toDateString(); }
-
-  function dayHeader(dt) {
-    var t = DB.TODAY, y = new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1);
-    if (sameDay(dt, t)) return 'Сегодня, ' + dt.getDate() + ' ' + MON_GEN[dt.getMonth()];
-    if (sameDay(dt, y)) return 'Вчера, ' + dt.getDate() + ' ' + MON_GEN[dt.getMonth()];
-    return dt.getDate() + ' ' + MON_GEN[dt.getMonth()] + ' ' + dt.getFullYear();
-  }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function dLong(dt) { return pad(dt.getDate()) + ' ' + MONTHS[dt.getMonth()] + ' ' + dt.getFullYear(); }
+  function dShort(dt) { return pad(dt.getDate()) + ' ' + MON_SHORT[dt.getMonth()]; }
+  function dNum(dt) { return pad(dt.getDate()) + '/' + pad(dt.getMonth() + 1) + '/' + dt.getFullYear(); }
+  function tTime(dt) { return pad(dt.getHours()) + ':' + pad(dt.getMinutes()); }
+  function dayHeader(dt) { return WEEKDAYS[dt.getDay()] + ', ' + dLong(dt); }
 
   function monthStart(y, m) { return new Date(y, m, 1, 0, 0, 0); }
   function monthEnd(y, m) { return new Date(y, m + 1, 0, 23, 59, 59); }
   function cat(id) { return DB.CATEGORIES[id] || { label: id, icon: 'receipt' }; }
 
-  /* ---------------------------------------------------------------- 3. Тосты и шиты */
+  /* ---------------------------------------------------------------- 3. Toasts and sheets */
   function toast(text, ms) {
     var el = document.createElement('div');
     el.className = 'toast';
@@ -135,7 +129,7 @@
     }, 240);
   }
 
-  /* ---------------------------------------------------------------- 4. Общие блоки */
+  /* ---------------------------------------------------------------- 4. Shared blocks */
   function plastic(acc, big) {
     var cls = 'plastic' + (acc.art === 'dark' ? ' plastic--dark' : acc.art === 'vault' ? ' plastic--vault' : '') + (big ? ' plastic--big' : '');
     return '<div class="' + cls + '">' +
@@ -150,30 +144,38 @@
       '</div></div>';
   }
 
-  function txRow(t, opts) {
-    opts = opts || {};
-    var c = cat(t.category), inn = t.amount >= 0;
-    return '<button class="tx" data-action="tx" data-id="' + t.id + '">' +
-      '<span class="tx__ic">' + icon(c.icon) + '</span>' +
-      '<span class="tx__body">' +
-        '<span class="tx__name">' + esc(t.merchant) + '</span>' +
-        '<span class="tx__meta">' + esc(c.label) + ' · ' + tTime(t.date) +
-          (opts.showAccount ? ' · ' + esc(DB.account(t.accountId).name) : '') + '</span>' +
-      '</span>' +
-      '<span class="tx__amt' + (inn ? ' tx__amt--in' : '') + '"><span class="num">' + money(t.amount) + '</span>' +
-        (opts.balance ? '<span class="tx__bal num">' + money(t.balanceAfter) + '</span>' : '') +
-      '</span></button>';
+  /* Мета-блок строки операции: тип, счета, категория — каждая строка отдельно,
+     как в приложении-референсе. У расхода сначала «To:», у прихода — «From:». */
+  function txMeta(t) {
+    var lines = [t.channel];
+    if (t.from && t.to) {
+      lines = lines.concat(t.amount < 0 ? ['To: ' + t.to, 'From: ' + t.from] : ['From: ' + t.from, 'To: ' + t.to]);
+    } else if (t.from || t.to) {
+      lines.push(t.from || t.to);
+    }
+    lines.push(cat(t.category).label);
+    return lines.map(function (l) { return '<span class="tx__meta">' + esc(l) + '</span>'; }).join('');
   }
 
-  function txGrouped(list, opts) {
+  function txRow(t) {
+    return '<button class="tx" data-action="tx" data-id="' + t.id + '">' +
+      '<span class="tx__ic">' + icon(cat(t.category).icon) + '</span>' +
+      '<span class="tx__body">' +
+        '<span class="tx__name">' + esc(t.merchant) + '</span>' + txMeta(t) +
+      '</span>' +
+      '<span class="tx__amt' + (t.amount < 0 ? ' tx__amt--out' : '') + ' num">' + moneySigned(t.amount) + '</span>' +
+    '</button>';
+  }
+
+  function txGrouped(list) {
     if (!list.length) {
-      return '<div class="empty">' + icon('search') + '<p>Ничего не найдено.<br>Измените период или условия поиска.</p></div>';
+      return '<div class="empty">' + icon('search') + '<p>No transactions found.<br>Try a different period or search term.</p></div>';
     }
     var out = '', last = '';
     list.forEach(function (t) {
       var h = dayHeader(t.date);
       if (h !== last) { out += '<div class="daylabel">' + esc(h) + '</div>'; last = h; }
-      out += txRow(t, opts);
+      out += txRow(t);
     });
     return out;
   }
@@ -190,7 +192,7 @@
       '</button>';
   }
 
-  /* ---------------------------------------------------------------- 5. Экран: вход */
+  /* ---------------------------------------------------------------- 5. Screen: log in */
   function renderLogin() {
     return '<div class="login">' +
       '<div class="login__brand">' +
@@ -198,43 +200,43 @@
         '<span class="login__name">' + DB.BANK.name + '</span>' +
       '</div>' +
       '<div class="field">' +
-        '<input class="field__input" id="f-user" type="text" placeholder="Логин" autocomplete="username" spellcheck="false">' +
-        '<button class="field__link" data-action="forgot">Забыли логин?</button>' +
+        '<input class="field__input" id="f-user" type="text" placeholder="Username" autocomplete="username" spellcheck="false">' +
+        '<button class="field__link" data-action="forgot">Forgot username?</button>' +
       '</div>' +
       '<div class="field">' +
-        '<input class="field__input" id="f-pass" type="password" placeholder="Пароль" autocomplete="current-password">' +
+        '<input class="field__input" id="f-pass" type="password" placeholder="Password" autocomplete="current-password">' +
         '<button class="field__eye" data-action="toggle-pass">' + icon('eye') + '</button>' +
-        '<button class="field__link" data-action="forgot">Забыли пароль?</button>' +
+        '<button class="field__link" data-action="forgot">Forgot password?</button>' +
       '</div>' +
       '<div class="login__spacer"></div>' +
-      '<div class="login__hint">Демо-доступ: <b>thandi</b> / <b>demo1234</b>. Данные вымышленные, платежи не проводятся.</div>' +
+      '<div class="login__hint">Demo access: <b>thandi</b> / <b>demo1234</b>. All data is fictional and no payments are processed.</div>' +
       '<div class="btnrow">' +
-        '<button class="btn btn--ghost" data-action="login-clear">Отмена</button>' +
-        '<button class="btn btn--primary" data-action="login">Войти</button>' +
+        '<button class="btn btn--ghost" data-action="login-clear">Cancel</button>' +
+        '<button class="btn btn--primary" data-action="login">Log in</button>' +
       '</div>' +
     '</div>';
   }
 
   function doLogin() {
     var u = $('#f-user'), p = $('#f-pass');
-    if (!u.value.trim() || !p.value) { toast('Введите логин и пароль'); return; }
+    if (!u.value.trim() || !p.value) { toast('Please enter your credentials to log in'); return; }
     if (u.value.trim().toLowerCase() !== DB.USER.username || p.value !== DB.USER.password) {
-      toast('Неверный логин или пароль'); return;
+      toast('Incorrect username or password'); return;
     }
     S.authed = true;
     S.stack = [];
     save();
     go('home', {}, 'fade');
-    setTimeout(function () { toast('Добро пожаловать, ' + DB.USER.first); }, 380);
+    setTimeout(function () { toast('Welcome back, ' + DB.USER.first); }, 380);
   }
 
-  /* ---------------------------------------------------------------- 6. Экран: дашборд */
+  /* ---------------------------------------------------------------- 6. Screen: dashboard */
   var PRODUCTS = [
-    { id: 'bank',   label: 'Банк',      icon: 'bank',   on: true },
-    { id: 'health', label: 'Здоровье',  icon: 'heart' },
-    { id: 'life',   label: 'Жизнь',     icon: 'shield' },
-    { id: 'invest', label: 'Инвестиции',icon: 'chart' },
-    { id: 'insure', label: 'Страховка', icon: 'house' }
+    { id: 'bank',   label: 'Bank',   icon: 'bank', on: true },
+    { id: 'health', label: 'Health', icon: 'heart' },
+    { id: 'life',   label: 'Life',   icon: 'shield' },
+    { id: 'invest', label: 'Invest', icon: 'chart' },
+    { id: 'insure', label: 'Insure', icon: 'house' }
   ];
 
   function homeAppbar() {
@@ -243,7 +245,7 @@
           '<button class="iconbtn stack" data-action="inbox">' + icon('mail') +
             '<span class="badge num">167</span></button>' +
         '</div>' +
-        '<div class="appbar__title">Банк ' + '<span style="width:18px;height:18px;color:var(--ink)">' + icon('chevronUp', { w: 2 }) + '</span></div>' +
+        '<div class="appbar__title">Bank <span style="width:18px;height:18px;color:var(--ink)">' + icon('chevronUp', { w: 2 }) + '</span></div>' +
         '<div class="appbar__side appbar__side--right">' +
           '<button class="ai-pill" data-action="assistant"><i></i>AI</button>' +
         '</div>' +
@@ -264,12 +266,12 @@
     var cards = '<button class="acard" data-action="tab" data-id="accounts">' +
       '<span class="acard__art">' + plastic(DB.ACCOUNTS[0]) + '</span>' +
       '<span class="acard__body">' +
-        '<span class="acard__name">Банковский портфель</span>' +
-        '<span class="acard__type">' + DB.ACCOUNTS.length + ' счёта</span>' +
+        '<span class="acard__name">Bank Portfolio</span>' +
+        '<span class="acard__type">' + DB.ACCOUNTS.length + ' accounts</span>' +
         '<span class="acard__amt num">' + money(total) + '</span>' +
-        '<span class="acard__lbl">Общий баланс</span>' +
+        '<span class="acard__lbl">Total balance</span>' +
         '<span class="acard__amt acard__amt--2 num">' + money(avail) + '</span>' +
-        '<span class="acard__lbl">Доступно</span>' +
+        '<span class="acard__lbl">Your available balance</span>' +
       '</span></button>';
 
     cards += DB.ACCOUNTS.map(function (a) {
@@ -278,10 +280,10 @@
         '<span class="acard__body">' +
           '<span class="acard__name">' + esc(a.name) + '</span>' +
           '<span class="acard__type">' + esc(a.type) + ' · ' + esc(a.last4) + '</span>' +
-          '<span class="acard__amt num">' + money(a.balance) + '</span>' +
-          '<span class="acard__lbl">' + (a.kind === 'credit' ? 'Задолженность' : 'Баланс') + '</span>' +
+          '<span class="acard__amt num">' + moneySigned(a.balance) + '</span>' +
+          '<span class="acard__lbl">' + (a.kind === 'credit' ? 'Outstanding balance' : 'Total balance') + '</span>' +
           '<span class="acard__amt acard__amt--2 num">' + money(a.available) + '</span>' +
-          '<span class="acard__lbl">' + (a.kind === 'credit' ? 'Доступный лимит' : 'Доступно') + '</span>' +
+          '<span class="acard__lbl">' + (a.kind === 'credit' ? 'Available credit' : 'Available balance') + '</span>' +
         '</span></button>';
     }).join('');
 
@@ -290,10 +292,8 @@
         return '<span class="dot' + (i === 0 ? ' dot--on' : '') + '"></span>';
       }).join('') + '</div>';
 
-    /* расход за текущий месяц против бюджета */
     var mStart = monthStart(DB.TODAY.getFullYear(), DB.TODAY.getMonth());
-    var mTx = DB.txFor('all', mStart, DB.TODAY);
-    var spent = DB.spend(mTx);
+    var spent = DB.spend(DB.txFor('all', mStart, DB.TODAY));
     var pct = Math.min(100, Math.round(spent / DB.BUDGET * 100));
 
     var behaviours = DB.BEHAVIOURS.map(function (b) {
@@ -303,33 +303,31 @@
         '<span>' + b.label + '</span></button>';
     }).join('');
 
-    var recent = DB.TX.slice(0, 5).map(function (t) { return txRow(t, { showAccount: true }); }).join('');
-
     return '<div class="hello">' +
         '<span class="avatar">' + DB.USER.initials + '</span>' +
         '<span><span class="hello__name">' + DB.USER.first + ' ' + DB.USER.last + '</span>' +
-        '<span class="hello__sub">Клиент с ' + DB.USER.since + ' · ' + DB.USER.tier + '</span></span>' +
+        '<span class="hello__sub">Client since ' + DB.USER.since + ' · ' + DB.USER.tier + '</span></span>' +
       '</div>' +
 
-      '<div class="sechead"><h2>Счета</h2>' +
+      '<div class="sechead"><h2>Accounts</h2>' +
         '<button class="iconbtn" data-action="hide">' + icon(S.hide ? 'eyeOff' : 'eye') + '</button></div>' +
       '<div class="carousel" id="carousel">' + cards + '</div>' + dots +
 
       '<div class="momentum">' +
         '<div class="momentum__head">' +
           '<span class="momentum__title">Momentum Money</span>' +
-          '<button class="momentum__status" data-action="momentum">Статус Bronze' + icon('chevron', { w: 2 }) + '</button>' +
+          '<button class="momentum__status" data-action="momentum">Bronze Status' + icon('chevron', { w: 2 }) + '</button>' +
         '</div>' +
-        '<div class="panel"><div class="panel__title">Финансовые привычки</div>' +
+        '<div class="panel"><div class="panel__title">Financial Behaviours</div>' +
           '<div class="behaviours">' + behaviours + '</div></div>' +
-        '<div class="panel"><div class="panel__title">Финансовый анализатор</div>' +
+        '<div class="panel"><div class="panel__title">Financial Analyser</div>' +
           '<div class="analyser">' +
             '<div class="donut" style="--p:' + pct + '"><span class="donut__pct num">' + pct + '%</span></div>' +
             '<div><div class="analyser__amt num">' + money(DB.BUDGET) + '</div>' +
-              '<div class="analyser__lbl">Бюджет на месяц</div>' +
+              '<div class="analyser__lbl">Monthly budget</div>' +
               '<div class="legend">' +
-                '<span class="legend__i"><i class="legend__sw"></i>Потрачено ' + money(spent) + '</span>' +
-                '<span class="legend__i"><i class="legend__sw legend__sw--track"></i>Осталось ' + money(Math.max(0, DB.BUDGET - spent)) + '</span>' +
+                '<span class="legend__i"><i class="legend__sw"></i>Spent ' + money(spent) + '</span>' +
+                '<span class="legend__i"><i class="legend__sw legend__sw--track"></i>Left ' + money(Math.max(0, DB.BUDGET - spent)) + '</span>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -337,86 +335,84 @@
       '</div>' +
 
       '<div class="actions">' +
-        '<button class="action" data-action="soon"><span class="action__ic">' + icon('swap') + '</span><span>Перевод</span></button>' +
+        '<button class="action" data-action="soon"><span class="action__ic">' + icon('swap') + '</span><span>Transfer</span></button>' +
         '<button class="action" data-action="soon"><span class="action__ic">' + icon('payshap') + '</span><span>PayShap</span></button>' +
-        '<button class="action" data-action="soon"><span class="action__ic">' + icon('bolt') + '</span><span>Платежи</span></button>' +
-        '<button class="action" data-action="statements"><span class="action__ic">' + icon('doc') + '</span><span>Выписка</span></button>' +
+        '<button class="action" data-action="soon"><span class="action__ic">' + icon('bolt') + '</span><span>Pay bills</span></button>' +
+        '<button class="action" data-action="statements"><span class="action__ic">' + icon('doc') + '</span><span>Statement</span></button>' +
       '</div>' +
 
-      '<div class="sechead" style="padding-top:18px"><h2 style="font-size:19px">Последние операции</h2>' +
-        '<button class="sechead__link" data-action="tab" data-id="transact">Вся история</button></div>' +
-      recent;
+      '<div class="sechead" style="padding-top:18px"><h2 style="font-size:19px">Recent transactions</h2>' +
+        '<button class="sechead__link" data-action="tab" data-id="transact">See all</button></div>' +
+      DB.TX.slice(0, 5).map(txRow).join('');
   }
 
-  /* ---------------------------------------------------------------- 7. Экран: счета */
+  /* ---------------------------------------------------------------- 7. Screen: accounts */
   function renderAccounts() {
-    var total = DB.portfolio();
     var rows = DB.ACCOUNTS.map(function (a) {
       return '<button class="row" data-action="account" data-id="' + a.id + '">' +
         '<span class="row__ic">' + icon(a.kind === 'credit' ? 'cards' : a.kind === 'savings' ? 'piggy' : 'bank') + '</span>' +
         '<span class="row__body"><span class="row__label">' + esc(a.name) + '</span>' +
           '<span class="row__sub">' + esc(a.type) + ' · ' + esc(a.number) + '</span></span>' +
-        '<span class="row__meta"><span class="num">' + money(a.balance) + '</span>' +
-          '<span class="row__sub num">' + money(a.available) + ' доступно</span></span>' +
+        '<span class="row__meta"><span class="num">' + moneySigned(a.balance) + '</span>' +
+          '<span class="row__sub num">' + money(a.available) + ' available</span></span>' +
         '<span class="row__chev">' + icon('chevron') + '</span></button>';
     }).join('');
 
-    return '<div class="sechead"><h2>Портфель</h2>' +
+    return '<div class="sechead"><h2>Portfolio</h2>' +
         '<button class="iconbtn" data-action="hide">' + icon(S.hide ? 'eyeOff' : 'eye') + '</button></div>' +
       '<div style="padding:0 20px 16px">' +
         '<div class="acard" style="display:block;padding:16px">' +
-          '<div class="acard__lbl">Общий баланс</div>' +
-          '<div class="t-display num" style="margin-top:2px">' + money(total) + '</div>' +
-          '<div class="acard__lbl" style="margin-top:10px">Доступно ' + money(DB.portfolioAvailable()) + '</div>' +
+          '<div class="acard__lbl">Total balance</div>' +
+          '<div class="t-display num" style="margin-top:2px">' + money(DB.portfolio()) + '</div>' +
+          '<div class="acard__lbl" style="margin-top:10px">Your available balance ' + money(DB.portfolioAvailable()) + '</div>' +
         '</div></div>' +
-      '<div class="group"><div class="group__head">Мои счета</div>' + rows + '</div>' +
-      '<div class="group"><div class="group__head">Документы</div>' +
-        row({ icon: 'doc', label: 'Заказать выписку', sub: 'PDF или CSV на e-mail', action: 'order' }) +
-        row({ icon: 'docs', label: 'Мои выписки', sub: S.requests.length ? S.requests.length + ' заявок' : 'Заявок пока нет', action: 'statements' }) +
+      '<div class="group"><div class="group__head">My accounts</div>' + rows + '</div>' +
+      '<div class="group"><div class="group__head">Documents</div>' +
+        row({ icon: 'doc', label: 'Order a statement', sub: 'PDF or CSV by email', action: 'order' }) +
+        row({ icon: 'docs', label: 'My statements', sub: S.requests.length ? S.requests.length + ' requests' : 'No requests yet', action: 'statements' }) +
       '</div>';
   }
 
   function renderAccount(p) {
     var a = DB.account(p.id);
-    if (!a) return '<div class="empty"><p>Счёт не найден</p></div>';
-    var list = DB.txFor(a.id).slice(0, 12);
+    if (!a) return '<div class="empty"><p>Account not found</p></div>';
 
     var kv = [
-      ['Номер счёта', a.number],
-      ['Тип', a.type],
-      ['Код филиала', DB.BANK.branch],
+      ['Account number', a.number],
+      ['Account type', a.type],
+      ['Branch code', DB.BANK.branch],
       ['SWIFT', DB.BANK.swift],
-      ['Валюта', DB.BANK.currency]
+      ['Currency', DB.BANK.currency]
     ];
-    if (a.kind === 'savings') kv.push(['Ставка', a.rate.toFixed(2).replace('.', ',') + '% годовых']);
+    if (a.kind === 'savings') kv.push(['Interest rate', a.rate.toFixed(2) + '% p.a.']);
     if (a.kind === 'credit') {
-      kv.push(['Кредитный лимит', amount(a.limit)]);
-      kv.push(['Ставка', a.rate.toFixed(2).replace('.', ',') + '% годовых']);
+      kv.push(['Credit limit', amount(a.limit)]);
+      kv.push(['Interest rate', a.rate.toFixed(2) + '% p.a.']);
     }
 
     return '<div class="cards-hero">' + plastic(a, true) + '</div>' +
       '<div style="padding:16px 20px 4px;text-align:center">' +
-        '<div class="acard__lbl">' + (a.kind === 'credit' ? 'Задолженность' : 'Текущий баланс') + '</div>' +
-        '<div class="t-display num">' + money(a.balance) + '</div>' +
+        '<div class="acard__lbl">' + (a.kind === 'credit' ? 'Outstanding balance' : 'Total balance') + '</div>' +
+        '<div class="t-display num">' + moneySigned(a.balance) + '</div>' +
         '<div class="acard__lbl" style="margin-top:4px">' +
-          (a.kind === 'credit' ? 'Доступный лимит ' : 'Доступно ') + money(a.available) + '</div>' +
+          (a.kind === 'credit' ? 'Available credit ' : 'Your available balance ') + money(a.available) + '</div>' +
       '</div>' +
       '<div class="actions">' +
-        '<button class="action" data-action="soon"><span class="action__ic">' + icon('swap') + '</span><span>Перевод</span></button>' +
-        '<button class="action" data-action="details" data-id="' + a.id + '"><span class="action__ic">' + icon('receipt') + '</span><span>Реквизиты</span></button>' +
-        '<button class="action" data-action="order-for" data-id="' + a.id + '"><span class="action__ic">' + icon('doc') + '</span><span>Выписка</span></button>' +
-        '<button class="action" data-action="freeze"><span class="action__ic">' + icon('lock') + '</span><span>' + (S.frozen ? 'Разблок.' : 'Заморозить') + '</span></button>' +
+        '<button class="action" data-action="soon"><span class="action__ic">' + icon('swap') + '</span><span>Transfer</span></button>' +
+        '<button class="action" data-action="details" data-id="' + a.id + '"><span class="action__ic">' + icon('receipt') + '</span><span>Details</span></button>' +
+        '<button class="action" data-action="order-for" data-id="' + a.id + '"><span class="action__ic">' + icon('doc') + '</span><span>Statement</span></button>' +
+        '<button class="action" data-action="freeze"><span class="action__ic">' + icon('lock') + '</span><span>' + (S.frozen ? 'Unfreeze' : 'Freeze') + '</span></button>' +
       '</div>' +
       '<div class="hr"></div>' +
       '<div class="kvlist">' + kv.map(function (r) {
         return '<div class="kv"><span class="kv__k">' + esc(r[0]) + '</span><span class="kv__v num">' + esc(r[1]) + '</span></div>';
       }).join('') + '</div>' +
-      '<div class="sechead" style="padding-top:8px"><h2 style="font-size:19px">Операции</h2>' +
-        '<button class="sechead__link" data-action="history-for" data-id="' + a.id + '">Вся история</button></div>' +
-      txGrouped(list, { balance: true });
+      '<div class="sechead" style="padding-top:8px"><h2 style="font-size:19px">Transactions</h2>' +
+        '<button class="sechead__link" data-action="history-for" data-id="' + a.id + '">See all</button></div>' +
+      txGrouped(DB.txFor(a.id).slice(0, 12));
   }
 
-  /* ---------------------------------------------------------------- 8. Экран: история */
+  /* ---------------------------------------------------------------- 8. Screen: history */
   function filteredTx() {
     var from = null, to = null;
     if (S.tx.month !== 'all') {
@@ -438,36 +434,35 @@
 
   function renderTransact() {
     var list = filteredTx(), tot = DB.totals(list);
-    var months = DB.monthList();
 
-    var monthChips = '<button class="chip' + (S.tx.month === 'all' ? ' chip--on' : '') + '" data-action="m" data-id="all">Все месяцы</button>' +
-      months.map(function (m) {
+    var monthChips = '<button class="chip' + (S.tx.month === 'all' ? ' chip--on' : '') + '" data-action="m" data-id="all">All months</button>' +
+      DB.monthList().map(function (m) {
         var k = m.year + '-' + m.month;
         return '<button class="chip' + (S.tx.month === k ? ' chip--on' : '') + '" data-action="m" data-id="' + k + '">' +
-          MON_NOM[m.month] + '</button>';
+          MONTHS[m.month] + '</button>';
       }).join('');
 
-    var accChips = '<button class="chip' + (S.tx.account === 'all' ? ' chip--on' : '') + '" data-action="a" data-id="all">Все счета</button>' +
+    var accChips = '<button class="chip' + (S.tx.account === 'all' ? ' chip--on' : '') + '" data-action="a" data-id="all">All accounts</button>' +
       DB.ACCOUNTS.map(function (a) {
         return '<button class="chip' + (S.tx.account === a.id ? ' chip--on' : '') + '" data-action="a" data-id="' + a.id + '">' +
           esc(a.name) + '</button>';
       }).join('');
 
     return '<div class="searchbar"><div class="search">' + icon('search') +
-        '<input id="f-q" type="search" placeholder="Поиск по операциям" value="' + esc(S.tx.q) + '">' +
+        '<input id="f-q" type="search" placeholder="Search transactions" value="' + esc(S.tx.q) + '">' +
         '<button data-action="filter-sheet" style="color:var(--navy)">' + icon('filter') + '</button>' +
       '</div></div>' +
       '<div class="chips">' + monthChips + '</div>' +
       '<div class="chips" style="padding-top:0">' + accChips + '</div>' +
       '<div class="summary">' +
-        '<div class="summary__i"><div class="summary__lbl">Поступления</div>' +
-          '<div class="summary__val num" style="color:var(--credit)">' + money(tot.in) + '</div></div>' +
-        '<div class="summary__i"><div class="summary__lbl">Расходы</div>' +
+        '<div class="summary__i"><div class="summary__lbl">Money in</div>' +
+          '<div class="summary__val num">' + money(tot.in) + '</div></div>' +
+        '<div class="summary__i"><div class="summary__lbl">Money out</div>' +
           '<div class="summary__val num">' + money(tot.out) + '</div></div>' +
       '</div>' +
       '<div style="padding:0 20px 12px"><button class="btn btn--quiet btn--wide" data-action="order-current">' +
-        icon('doc') + 'Выписка за выбранный период</button></div>' +
-      txGrouped(list, { showAccount: S.tx.account === 'all', balance: S.tx.account !== 'all' });
+        icon('doc') + 'Statement for this selection</button></div>' +
+      txGrouped(list);
   }
 
   function openTx(id) {
@@ -475,83 +470,85 @@
     if (!t) return;
     var a = DB.account(t.accountId), c = cat(t.category);
     var rows = [
-      ['Счёт', a.name + ' · ' + a.last4],
-      ['Категория', c.label],
-      ['Дата', dLong(t.date) + ', ' + tTime(t.date)],
-      ['Канал', t.channel],
-      ['Референс', t.ref],
-      ['Баланс после', amount(t.balanceAfter)]
+      ['Account', a.name + ' · ' + a.last4],
+      ['Category', c.label],
+      ['Date', dLong(t.date) + ', ' + tTime(t.date)],
+      ['Channel', t.channel],
+      ['Reference', t.ref],
+      ['Balance after', amountSigned(t.balanceAfter)]
     ];
-    if (t.note) rows.splice(2, 0, ['Назначение', t.note]);
+    if (t.from) rows.splice(2, 0, ['From', t.from]);
+    if (t.to) rows.splice(t.from ? 3 : 2, 0, ['To', t.to]);
+    if (t.note) rows.splice(2, 0, ['Description', t.note]);
 
     openSheet(null,
-      '<div style="display:flex;align-items:center;gap:13px;margin-bottom:14px">' +
+      '<div style="display:flex;align-items:flex-start;gap:13px;margin-bottom:14px">' +
         '<span class="tx__ic" style="width:46px;height:46px;flex:0 0 46px">' + icon(c.icon) + '</span>' +
         '<span style="flex:1 1 auto;min-width:0">' +
           '<span class="t-section" style="display:block">' + esc(t.merchant) + '</span>' +
           '<span class="t-cap">' + esc(c.label) + '</span></span>' +
-        '<span class="t-hero num"' + (t.amount >= 0 ? ' style="color:var(--credit)"' : '') + '>' + amount(t.amount) + '</span>' +
+        '<span class="t-hero num"' + (t.amount < 0 ? ' style="color:var(--debit)"' : '') + '>' + amountSigned(t.amount) + '</span>' +
       '</div>' +
       '<div class="kvlist" style="padding:0">' + rows.map(function (r) {
         return '<div class="kv"><span class="kv__k">' + esc(r[0]) + '</span><span class="kv__v num">' + esc(r[1]) + '</span></div>';
       }).join('') + '</div>' +
       '<div class="btnrow" style="margin-top:16px">' +
-        '<button class="btn btn--ghost" data-action="soon">Оспорить</button>' +
-        '<button class="btn btn--primary" data-action="proof" data-id="' + t.id + '">Подтверждение</button>' +
+        '<button class="btn btn--ghost" data-action="soon">Dispute</button>' +
+        '<button class="btn btn--primary" data-action="proof" data-id="' + t.id + '">Proof of payment</button>' +
       '</div>');
   }
 
-  /* ---------------------------------------------------------------- 9. Экран: карты */
+  /* ---------------------------------------------------------------- 9. Screen: cards */
   function renderCards() {
     var a = DB.account('ac-everyday'), c = DB.account('ac-credit');
     return '<div class="cards-hero">' + plastic(a, true) +
         '<div style="text-align:center">' +
           '<div class="t-section">' + esc(a.name) + '</div>' +
-          '<div class="t-cap">' + esc(a.pan) + ' · ' + (S.frozen ? 'Заморожена' : 'Активна') + '</div>' +
+          '<div class="t-cap">' + esc(a.pan) + ' · ' + (S.frozen ? 'Frozen' : 'Active') + '</div>' +
         '</div></div>' +
       '<div class="actions">' +
-        '<button class="action" data-action="freeze"><span class="action__ic">' + icon('lock') + '</span><span>' + (S.frozen ? 'Разблок.' : 'Заморозить') + '</span></button>' +
-        '<button class="action" data-action="soon"><span class="action__ic">' + icon('settings') + '</span><span>Лимиты</span></button>' +
-        '<button class="action" data-action="soon"><span class="action__ic">' + icon('globe') + '</span><span>Поездки</span></button>' +
-        '<button class="action" data-action="soon"><span class="action__ic">' + icon('bell') + '</span><span>Уведомления</span></button>' +
+        '<button class="action" data-action="freeze"><span class="action__ic">' + icon('lock') + '</span><span>' + (S.frozen ? 'Unfreeze' : 'Freeze') + '</span></button>' +
+        '<button class="action" data-action="soon"><span class="action__ic">' + icon('settings') + '</span><span>Limits</span></button>' +
+        '<button class="action" data-action="soon"><span class="action__ic">' + icon('globe') + '</span><span>Travel</span></button>' +
+        '<button class="action" data-action="soon"><span class="action__ic">' + icon('bell') + '</span><span>Alerts</span></button>' +
       '</div>' +
-      '<div class="group" style="margin-top:12px"><div class="group__head">Все карты</div>' +
-        row({ icon: 'cards', label: a.name, sub: 'Дебетовая · ' + a.last4, meta: '<span class="num">' + money(a.available) + '</span>', action: 'account', id: a.id }) +
-        row({ icon: 'cards', label: c.name, sub: 'Кредитная · ' + c.last4, meta: '<span class="num">' + money(c.available) + '</span>', action: 'account', id: c.id }) +
+      '<div class="group" style="margin-top:12px"><div class="group__head">All cards</div>' +
+        row({ icon: 'cards', label: a.name, sub: 'Debit · ' + a.last4, meta: '<span class="num">' + money(a.available) + '</span>', action: 'account', id: a.id }) +
+        row({ icon: 'cards', label: c.name, sub: 'Credit · ' + c.last4, meta: '<span class="num">' + money(c.available) + '</span>', action: 'account', id: c.id }) +
       '</div>' +
-      '<div class="group"><div class="group__head">Безопасность</div>' +
-        row({ icon: 'lock', label: 'Сменить PIN', action: 'soon' }) +
-        row({ icon: 'shield', label: 'Виртуальная карта', action: 'soon' }) +
-        row({ icon: 'bolt', label: 'Оплата в один клик', action: 'soon' }) +
+      '<div class="group"><div class="group__head">Security</div>' +
+        row({ icon: 'lock', label: 'Change PIN', action: 'soon' }) +
+        row({ icon: 'shield', label: 'Virtual card', action: 'soon' }) +
+        row({ icon: 'bolt', label: 'One-click payments', action: 'soon' }) +
       '</div>';
   }
 
-  /* ---------------------------------------------------------------- 10. Экран: ещё */
+  /* ---------------------------------------------------------------- 10. Screen: more */
   function renderMore() {
     return '<div class="group" style="border-top:0">' +
-        row({ icon: 'travel', label: 'Путешествия', action: 'soon' }) +
+        row({ icon: 'travel', label: 'Travel', action: 'soon' }) +
         row({ icon: 'payshap', label: 'PayShap', action: 'soon' }) +
       '</div>' +
       '<div class="group"><div class="group__head">Meridian Pay</div>' +
-        row({ icon: 'seal', label: 'Платежи по контактам', action: 'soon' }) +
+        row({ icon: 'seal', label: 'Contact Payments', action: 'soon' }) +
         row({ icon: 'heart', label: 'Health Pay', action: 'soon' }) +
         row({ icon: 'tick', label: 'Momentum Pay', action: 'soon' }) +
       '</div>' +
-      '<div class="group"><div class="group__head">Хранилище документов</div>' +
-        row({ icon: 'doc', label: 'Выписки', sub: 'Заказ и история заявок', action: 'statements' }) +
-        row({ icon: 'docs', label: 'Прочие документы', action: 'soon' }) +
+      '<div class="group"><div class="group__head">Document repository</div>' +
+        row({ icon: 'doc', label: 'Statements', sub: 'Order and request history', action: 'statements' }) +
+        row({ icon: 'docs', label: 'Other Documents', action: 'soon' }) +
       '</div>' +
-      '<div class="group"><div class="group__head">Управление</div>' +
-        row({ icon: 'plus', label: 'Добавить счёт', action: 'soon' }) +
-        row({ icon: 'settings', label: 'Настройки каналов', off: true }) +
-        row({ icon: 'bell', label: 'Уведомления', action: 'soon' }) +
-        row({ icon: 'user', label: 'Профиль и данные', action: 'profile' }) +
+      '<div class="group"><div class="group__head">Manage</div>' +
+        row({ icon: 'plus', label: 'Add Account', action: 'soon' }) +
+        row({ icon: 'settings', label: 'Channel settings', off: true }) +
+        row({ icon: 'bell', label: 'Notifications', action: 'soon' }) +
+        row({ icon: 'user', label: 'Profile and details', action: 'profile' }) +
       '</div>' +
       '<div style="position:sticky;bottom:0;padding:14px 20px 16px;background:linear-gradient(180deg,rgba(255,255,255,0),var(--surface) 34%)">' +
-        '<button class="btn btn--primary btn--wide" data-action="logout">Выйти</button></div>';
+        '<button class="btn btn--primary btn--wide" data-action="logout">Log out</button></div>';
   }
 
-  /* ---------------------------------------------------------------- 11. Выписки */
+  /* ---------------------------------------------------------------- 11. Statements */
   function periodOf(o) {
     var t = DB.TODAY;
     if (o.period === '1m') {
@@ -569,7 +566,7 @@
 
   function periodLabel(o) {
     var p = periodOf(o);
-    if (o.period === '1m') return MON_NOM[p.from.getMonth()] + ' ' + p.from.getFullYear();
+    if (o.period === '1m') return MONTHS[p.from.getMonth()] + ' ' + p.from.getFullYear();
     return dShort(p.from) + ' — ' + dShort(p.to) + ' ' + p.to.getFullYear();
   }
 
@@ -585,57 +582,57 @@
     }
 
     return '<div class="form">' +
-      '<label class="form__lbl">Счёт</label>' +
+      '<label class="form__lbl">Account</label>' +
       '<button class="picker" data-action="pick-account">' +
         '<span style="color:var(--magenta);width:28px">' + icon(a.kind === 'credit' ? 'cards' : a.kind === 'savings' ? 'piggy' : 'bank') + '</span>' +
         '<span class="picker__body"><span class="picker__t">' + esc(a.name) + '</span>' +
           '<span class="picker__s">' + esc(a.type) + ' · ' + esc(a.number) + '</span></span>' +
         '<span class="picker__chev">' + icon('chevron') + '</span></button>' +
 
-      '<label class="form__lbl">Период</label>' +
+      '<label class="form__lbl">Period</label>' +
       '<div class="segmented">' +
-        '<button data-action="p" data-id="1m" aria-pressed="' + (o.period === '1m') + '">Прошлый месяц</button>' +
-        '<button data-action="p" data-id="3m" aria-pressed="' + (o.period === '3m') + '">3 месяца</button>' +
-        '<button data-action="p" data-id="custom" aria-pressed="' + (o.period === 'custom') + '">Свой</button>' +
+        '<button data-action="p" data-id="1m" aria-pressed="' + (o.period === '1m') + '">Last month</button>' +
+        '<button data-action="p" data-id="3m" aria-pressed="' + (o.period === '3m') + '">3 months</button>' +
+        '<button data-action="p" data-id="custom" aria-pressed="' + (o.period === 'custom') + '">Custom</button>' +
       '</div>' +
       (o.period === 'custom'
         ? '<div class="btnrow" style="margin-top:10px">' +
             '<button class="picker" data-action="pick-from"><span class="picker__body">' +
-              '<span class="picker__s">С</span><span class="picker__t">' + dNum(p.from) + '</span></span>' +
+              '<span class="picker__s">From</span><span class="picker__t">' + dNum(p.from) + '</span></span>' +
               '<span class="picker__chev">' + icon('calendar') + '</span></button>' +
             '<button class="picker" data-action="pick-to"><span class="picker__body">' +
-              '<span class="picker__s">По</span><span class="picker__t">' + dNum(p.to) + '</span></span>' +
+              '<span class="picker__s">To</span><span class="picker__t">' + dNum(p.to) + '</span></span>' +
               '<span class="picker__chev">' + icon('calendar') + '</span></button>' +
           '</div>'
         : '') +
-      '<div class="note" style="margin-top:10px">Период: <b>' + esc(periodLabel(o)) + '</b> · операций в выписке: <b>' + n + '</b></div>' +
+      '<div class="note" style="margin-top:10px">Period: <b>' + esc(periodLabel(o)) + '</b> · transactions in this statement: <b>' + n + '</b></div>' +
 
-      '<label class="form__lbl">Что включить</label>' +
-      check('i-details', o.incl.details, 'Реквизиты счёта', 'Номер, филиал, SWIFT, остатки') +
-      check('i-tx', o.incl.tx, 'История транзакций', 'Дата, описание, референс, баланс') +
-      check('i-cats', o.incl.cats, 'Сводка по категориям', 'Разбивка расходов за период') +
+      '<label class="form__lbl">What to include</label>' +
+      check('i-details', o.incl.details, 'Account details', 'Number, branch code, SWIFT, balances') +
+      check('i-tx', o.incl.tx, 'Transaction history', 'Date, description, reference, balance') +
+      check('i-cats', o.incl.cats, 'Category summary', 'Spend breakdown for the period') +
 
-      '<label class="form__lbl">Формат</label>' +
-      check('f-pdf', o.format === 'pdf', 'PDF', 'Заверенная банком форма', 'radio') +
-      check('f-csv', o.format === 'csv', 'CSV', 'Для бухгалтерии и таблиц', 'radio') +
+      '<label class="form__lbl">Format</label>' +
+      check('f-pdf', o.format === 'pdf', 'PDF', 'Bank-certified layout', 'radio') +
+      check('f-csv', o.format === 'csv', 'CSV', 'For accounting and spreadsheets', 'radio') +
 
-      '<label class="form__lbl">Доставка</label>' +
-      check('d-email', o.delivery === 'email', 'На e-mail', DB.USER.emailMasked, 'radio') +
-      check('d-app', o.delivery === 'app', 'В приложении', 'Хранится 12 месяцев', 'radio') +
+      '<label class="form__lbl">Delivery</label>' +
+      check('d-email', o.delivery === 'email', 'By email', DB.USER.emailMasked, 'radio') +
+      check('d-app', o.delivery === 'app', 'In the app', 'Kept for 12 months', 'radio') +
 
-      '<div class="note">Первые 3 выписки в месяц — <b>бесплатно</b>. Использовано ' +
-        Math.min(3, S.requests.length) + ' из 3. Готовность — до 2 минут.</div>' +
+      '<div class="note">Your first 3 statements each month are <b>free</b>. Used ' +
+        Math.min(3, S.requests.length) + ' of 3. Ready within 2 minutes.</div>' +
 
       '<div style="margin-top:18px"><button class="btn btn--primary btn--wide" data-action="submit-order">' +
-        'Заказать выписку</button></div>' +
+        'Order statement</button></div>' +
     '</div>';
   }
 
   function submitOrder() {
     var o = S.order;
-    if (!o.incl.details && !o.incl.tx && !o.incl.cats) { toast('Выберите хотя бы один раздел'); return; }
+    if (!o.incl.details && !o.incl.tx && !o.incl.cats) { toast('Select at least one section'); return; }
     var p = periodOf(o);
-    if (p.from > p.to) { toast('Дата начала позже даты окончания'); return; }
+    if (p.from > p.to) { toast('The start date is after the end date'); return; }
 
     var req = {
       id: 'st' + Date.now(),
@@ -653,7 +650,7 @@
     S.requests.unshift(req);
     save();
     go('statements', {}, 'push');
-    toast('Заявка ' + req.ref + ' принята');
+    toast('Request ' + req.ref + ' received');
 
     setTimeout(function () {
       var r = S.requests.filter(function (x) { return x.id === req.id; })[0];
@@ -661,7 +658,7 @@
       r.status = 'ready';
       save();
       if (S.screen === 'statements') repaint();
-      toast(o.delivery === 'email' ? 'Выписка отправлена на ' + DB.USER.emailMasked : 'Выписка готова');
+      toast(o.delivery === 'email' ? 'Statement sent to ' + DB.USER.emailMasked : 'Your statement is ready');
     }, 2600);
   }
 
@@ -675,29 +672,29 @@
             '<span class="row__body"><span class="row__label">' + esc(a.name) + '</span>' +
               '<span class="row__sub">' + esc(r.label) + ' · ' + r.format.toUpperCase() + ' · ' + esc(r.ref) + '</span></span>' +
             '<span class="row__meta"><span class="pill' + (ready ? ' pill--ready' : '') + '">' +
-              (ready ? icon('check', { w: 2.6 }) + 'Готова' : '<span class="spin">' + icon('refresh', { w: 2 }) + '</span>Готовится') +
+              (ready ? icon('check', { w: 2.6 }) + 'Ready' : '<span class="spin">' + icon('refresh', { w: 2 }) + '</span>Processing') +
             '</span></span>' +
             '<span class="row__chev">' + icon('chevron') + '</span></button>';
         }).join('')
-      : '<div class="empty">' + icon('docs') + '<p>Заявок пока нет.<br>Закажите выписку — она появится здесь.</p></div>';
+      : '<div class="empty">' + icon('docs') + '<p>No requests yet.<br>Order a statement and it will appear here.</p></div>';
 
     var quick = DB.ACCOUNTS.map(function (a) {
-      return row({ icon: 'bolt', label: a.name, sub: 'Последние 3 месяца, PDF', action: 'quick', id: a.id });
+      return row({ icon: 'bolt', label: a.name, sub: 'Last 3 months, PDF', action: 'quick', id: a.id });
     }).join('');
 
     return '<div style="padding:16px 20px 4px">' +
-        '<button class="btn btn--primary btn--wide" data-action="order">' + icon('plus') + 'Заказать выписку</button>' +
+        '<button class="btn btn--primary btn--wide" data-action="order">' + icon('plus') + 'Order a statement</button>' +
       '</div>' +
-      '<div class="group" style="margin-top:12px"><div class="group__head">Мои заявки</div>' + reqs + '</div>' +
-      '<div class="group"><div class="group__head">Быстрая выписка</div>' + quick + '</div>' +
-      '<div class="note" style="margin:14px 20px 0">Выписка формируется по данным на ' + dLong(DB.TODAY) +
-        '. Документ содержит реквизиты счёта, обороты и остатки за период.</div>';
+      '<div class="group" style="margin-top:12px"><div class="group__head">My requests</div>' + reqs + '</div>' +
+      '<div class="group"><div class="group__head">Quick statement</div>' + quick + '</div>' +
+      '<div class="note" style="margin:14px 20px 0">Statements are generated from data as at ' + dLong(DB.TODAY) +
+        '. The document contains your account details, turnover and balances for the period.</div>';
   }
 
-  /* ---------------------------------------------------------------- 12. Документ выписки */
+  /* ---------------------------------------------------------------- 12. Statement document */
   function renderDoc(p) {
     var r = S.requests.filter(function (x) { return x.id === p.id; })[0];
-    if (!r) return '<div class="empty"><p>Выписка не найдена</p></div>';
+    if (!r) return '<div class="empty"><p>Statement not found</p></div>';
     var a = DB.account(r.accountId);
     var list = DB.txFor(r.accountId, r.from, r.to);
     var asc = list.slice().reverse();
@@ -710,58 +707,58 @@
     var head =
       '<div class="doc__head">' +
         '<div class="doc__brand">' + icon('mark', { w: 1.4 }) + '<b>' + DB.BANK.name + '</b></div>' +
-        '<div class="doc__kind"><b>Выписка по счёту</b>' + esc(r.ref) + '<br>от ' + dNum(r.created) + '</div>' +
+        '<div class="doc__kind"><b>Bank statement</b>' + esc(r.ref) + '<br>issued ' + dNum(r.created) + '</div>' +
       '</div>';
 
     var details = r.incl.details
       ? '<div class="doc__grid">' +
-          '<div class="doc__block"><h4>Клиент</h4><p>' + DB.USER.first + ' ' + DB.USER.last + '<br>' +
-            DB.USER.address.map(esc).join('<br>') + '<br>Клиент № ' + DB.USER.client + '</p></div>' +
-          '<div class="doc__block"><h4>Банк</h4><p>' + DB.BANK.legal + '<br>' + DB.BANK.address + '<br>' +
+          '<div class="doc__block"><h4>Account holder</h4><p>' + DB.USER.first + ' ' + DB.USER.last + '<br>' +
+            DB.USER.address.map(esc).join('<br>') + '<br>Client no. ' + DB.USER.client + '</p></div>' +
+          '<div class="doc__block"><h4>Bank</h4><p>' + DB.BANK.legal + '<br>' + DB.BANK.address + '<br>' +
             DB.BANK.reg + '</p></div>' +
-          '<div class="doc__block"><h4>Счёт</h4>' +
-            '<div class="doc__kv"><span>Название</span><b>' + esc(a.name) + '</b></div>' +
-            '<div class="doc__kv"><span>Номер</span><b class="num">' + esc(a.number) + '</b></div>' +
-            '<div class="doc__kv"><span>Тип</span><b>' + esc(a.type) + '</b></div>' +
-            '<div class="doc__kv"><span>Филиал</span><b class="num">' + DB.BANK.branch + '</b></div>' +
+          '<div class="doc__block"><h4>Account</h4>' +
+            '<div class="doc__kv"><span>Name</span><b>' + esc(a.name) + '</b></div>' +
+            '<div class="doc__kv"><span>Number</span><b class="num">' + esc(a.number) + '</b></div>' +
+            '<div class="doc__kv"><span>Type</span><b>' + esc(a.type) + '</b></div>' +
+            '<div class="doc__kv"><span>Branch</span><b class="num">' + DB.BANK.branch + '</b></div>' +
             '<div class="doc__kv"><span>SWIFT</span><b class="num">' + DB.BANK.swift + '</b></div>' +
           '</div>' +
-          '<div class="doc__block"><h4>Период</h4>' +
-            '<div class="doc__kv"><span>С</span><b class="num">' + dNum(r.from) + '</b></div>' +
-            '<div class="doc__kv"><span>По</span><b class="num">' + dNum(r.to) + '</b></div>' +
-            '<div class="doc__kv"><span>Валюта</span><b>' + DB.BANK.currency + '</b></div>' +
-            '<div class="doc__kv"><span>Операций</span><b class="num">' + list.length + '</b></div>' +
+          '<div class="doc__block"><h4>Period</h4>' +
+            '<div class="doc__kv"><span>From</span><b class="num">' + dNum(r.from) + '</b></div>' +
+            '<div class="doc__kv"><span>To</span><b class="num">' + dNum(r.to) + '</b></div>' +
+            '<div class="doc__kv"><span>Currency</span><b>' + DB.BANK.currency + '</b></div>' +
+            '<div class="doc__kv"><span>Transactions</span><b class="num">' + list.length + '</b></div>' +
           '</div>' +
         '</div>'
       : '';
 
     var table = r.incl.tx
-      ? '<div class="doc__sec">История транзакций</div>' +
+      ? '<div class="doc__sec">Transaction history</div>' +
         '<table class="doc__table"><thead><tr>' +
-          '<th>Дата</th><th>Описание</th><th>Сумма</th><th>Остаток</th>' +
+          '<th>Date</th><th>Description</th><th>Amount</th><th>Balance</th>' +
         '</tr></thead><tbody>' +
         (asc.length ? asc.map(function (t) {
           return '<tr><td class="num">' + dNum(t.date) + '</td>' +
             '<td>' + esc(t.merchant) + '<br><span style="color:var(--ink-3)">' +
               esc(cat(t.category).label) + ' · ' + esc(t.channel) + ' · ' + esc(t.ref) + '</span></td>' +
-            '<td class="r num' + (t.amount >= 0 ? ' in' : '') + '">' + signed(t.amount) + '</td>' +
-            '<td class="r num">' + amount(t.balanceAfter) + '</td></tr>';
-        }).join('') : '<tr><td colspan="4" style="padding:16px 22px;color:var(--ink-3)">За период операций нет</td></tr>') +
+            '<td class="r num">' + amountSigned(t.amount) + '</td>' +
+            '<td class="r num">' + amountSigned(t.balanceAfter) + '</td></tr>';
+        }).join('') : '<tr><td colspan="4" style="padding:16px 22px;color:var(--ink-3)">No transactions for this period</td></tr>') +
         '</tbody></table>'
       : '';
 
     var summary =
       '<div class="doc__tot">' +
-        '<div class="doc__kv"><span>Остаток на начало периода</span><b class="num">' + amount(open) + '</b></div>' +
-        '<div class="doc__kv"><span>Поступления</span><b class="num">' + amount(tot.in) + '</b></div>' +
-        '<div class="doc__kv"><span>Списания</span><b class="num">' + amount(-tot.out) + '</b></div>' +
-        '<div class="doc__kv"><span>Комиссии банка</span><b class="num">' + amount(tot.fees) + '</b></div>' +
+        '<div class="doc__kv"><span>Opening balance</span><b class="num">' + amountSigned(open) + '</b></div>' +
+        '<div class="doc__kv"><span>Money in</span><b class="num">' + amount(tot.in) + '</b></div>' +
+        '<div class="doc__kv"><span>Money out</span><b class="num">' + amountSigned(-tot.out) + '</b></div>' +
+        '<div class="doc__kv"><span>Bank fees</span><b class="num">' + amount(tot.fees) + '</b></div>' +
         '<div class="doc__kv" style="border-top:1px solid var(--line-2);margin-top:6px;padding-top:6px">' +
-          '<span>Остаток на конец периода</span><b class="num">' + amount(close) + '</b></div>' +
+          '<span>Closing balance</span><b class="num">' + amountSigned(close) + '</b></div>' +
       '</div>';
 
     var catBlock = r.incl.cats && cats.length
-      ? '<div class="doc__sec">Списания по категориям</div>' +
+      ? '<div class="doc__sec">Debits by category</div>' +
         '<div class="bars">' + cats.slice(0, 7).map(function (c) {
           return '<div><div class="bar__top"><span>' + esc(cat(c.category).label) + '</span>' +
             '<span class="num">' + amount(c.total) + '</span></div>' +
@@ -769,41 +766,41 @@
         }).join('') + '</div>'
       : '';
 
-    var foot = '<div class="doc__foot">Документ сформирован автоматически ' + dLong(r.created) +
-      ' и действителен без подписи. ' + DB.BANK.legal + ', ' + DB.BANK.reg +
-      '. Вопросы — ' + DB.BANK.support + '. Это демонстрационный макет: данные вымышленные.</div>';
+    var foot = '<div class="doc__foot">This statement was generated automatically on ' + dLong(r.created) +
+      ' and is valid without a signature. ' + DB.BANK.legal + ', ' + DB.BANK.reg +
+      '. Queries: ' + DB.BANK.support + '. This is a design mockup — all data is fictional.</div>';
 
     var bar = '<div class="docbar">' +
-      '<button class="btn btn--ghost" data-action="send-doc" data-id="' + r.id + '">' + icon('share') + 'На e-mail</button>' +
-      '<button class="btn btn--primary" data-action="print">' + icon('print') + 'Печать / PDF</button>' +
+      '<button class="btn btn--ghost" data-action="send-doc" data-id="' + r.id + '">' + icon('share') + 'Email</button>' +
+      '<button class="btn btn--primary" data-action="print">' + icon('print') + 'Print / PDF</button>' +
     '</div>';
 
     return '<div class="doc">' + head + details + table + summary + catBlock + foot + '</div>' + bar;
   }
 
-  /* ---------------------------------------------------------------- 13. Реестр экранов */
+  /* ---------------------------------------------------------------- 13. Screen registry */
   var SCREENS = {
-    login:      { chrome: false, title: 'Вход', render: renderLogin, flush: true },
+    login:      { chrome: false, title: 'Log in', render: renderLogin, flush: true },
     home:       { tab: 'home', appbar: homeAppbar, render: renderHome },
-    accounts:   { tab: 'accounts', title: 'Счета', render: renderAccounts },
-    account:    { tab: 'accounts', title: function (p) { var a = DB.account(p.id); return a ? a.name : 'Счёт'; }, back: true, render: renderAccount },
-    transact:   { tab: 'transact', title: 'История операций', render: renderTransact },
-    cards:      { tab: 'cards', title: 'Карты', render: renderCards },
-    more:       { tab: 'more', title: 'Ещё', render: renderMore, flush: true },
-    statements: { tab: 'more', title: 'Выписки', back: true, render: renderStatements },
-    order:      { tab: 'more', title: 'Заказать выписку', back: true, render: renderOrder },
-    doc:        { title: 'Выписка', back: true, render: renderDoc, noTabs: true, flush: true }
+    accounts:   { tab: 'accounts', title: 'Accounts', render: renderAccounts },
+    account:    { tab: 'accounts', title: function (p) { var a = DB.account(p.id); return a ? a.name : 'Account'; }, back: true, render: renderAccount },
+    transact:   { tab: 'transact', title: 'Transaction history', render: renderTransact },
+    cards:      { tab: 'cards', title: 'Cards', render: renderCards },
+    more:       { tab: 'more', title: 'More', render: renderMore, flush: true },
+    statements: { tab: 'more', title: 'Statements', back: true, render: renderStatements },
+    order:      { tab: 'more', title: 'Order a statement', back: true, render: renderOrder },
+    doc:        { title: 'Statement', back: true, render: renderDoc, noTabs: true, flush: true }
   };
 
   var TABS = [
-    { id: 'home', label: 'Главная', icon: 'home' },
-    { id: 'accounts', label: 'Счета', icon: 'accounts' },
-    { id: 'transact', label: 'Операции', icon: 'transact' },
-    { id: 'cards', label: 'Карты', icon: 'cards' },
-    { id: 'more', label: 'Ещё', icon: 'more' }
+    { id: 'home', label: 'Home', icon: 'home' },
+    { id: 'accounts', label: 'Accounts', icon: 'accounts' },
+    { id: 'transact', label: 'Transact', icon: 'transact' },
+    { id: 'cards', label: 'Cards', icon: 'cards' },
+    { id: 'more', label: 'More', icon: 'more' }
   ];
 
-  /* ---------------------------------------------------------------- 14. Роутер и отрисовка */
+  /* ---------------------------------------------------------------- 14. Router */
   function paintChrome() {
     var def = SCREENS[S.screen];
 
@@ -826,7 +823,7 @@
     }
 
     var noTabs = !S.authed || def.noTabs;
-    // класс двигает тосты выше нижней панели; на экране выписки её роль
+    // класс поднимает тосты над нижней панелью; на экране выписки её роль
     // играет docbar, поэтому ориентируемся только на авторизацию
     document.getElementById('phone').classList.toggle('phone--notabs', !S.authed);
     if (noTabs) {
@@ -849,8 +846,7 @@
     var old = existing[0];
 
     var next = document.createElement('section');
-    var base = 'screen' + (def.flush ? ' screen--flush' : '');
-    next.className = base;
+    next.className = 'screen' + (def.flush ? ' screen--flush' : '');
     next.innerHTML = def.render(S.params);
 
     var inCls = dir === 'pop' ? 'anim-pop-in' : dir === 'fade' ? 'anim-fade-in' : 'anim-push-in';
@@ -889,7 +885,7 @@
     else go('home', {}, 'fade');
   }
 
-  /* ---------------------------------------------------------------- 15. Хуки после отрисовки */
+  /* ---------------------------------------------------------------- 15. Post-paint hooks */
   function hook(screen, root) {
     if (screen === 'home') {
       var car = root.querySelector('#carousel'), dots = root.querySelector('#dots');
@@ -897,8 +893,7 @@
         car.addEventListener('scroll', function () {
           var card = car.querySelector('.acard');
           if (!card) return;
-          var step = card.offsetWidth + 12;
-          var i = Math.round(car.scrollLeft / step);
+          var i = Math.round(car.scrollLeft / (card.offsetWidth + 12));
           [].forEach.call(dots.children, function (d, n) { d.classList.toggle('dot--on', n === i); });
         }, { passive: true });
       }
@@ -906,54 +901,47 @@
     if (screen === 'transact') {
       var q = root.querySelector('#f-q');
       if (q) {
+        // перерисовываем только ленту, чтобы не терять фокус в поле ввода
         q.addEventListener('input', function () {
           S.tx.q = q.value;
           var list = filteredTx();
-          var holder = root.querySelector('.daylabel') ? root : null;
-          // перерисовываем только ленту, чтобы не терять фокус в поле
           var nodes = [].slice.call(root.children);
           var start = nodes.indexOf(root.querySelector('.summary')) + 2;
           for (var i = nodes.length - 1; i >= start; i--) nodes[i].remove();
           var frag = document.createElement('div');
-          frag.innerHTML = txGrouped(list, { showAccount: S.tx.account === 'all', balance: S.tx.account !== 'all' });
+          frag.innerHTML = txGrouped(list);
           while (frag.firstChild) root.appendChild(frag.firstChild);
-          var sum = root.querySelector('.summary');
+          var sum = root.querySelector('.summary'), tot = DB.totals(list);
           if (sum) {
-            var tot = DB.totals(list);
             sum.children[0].querySelector('.summary__val').textContent = money(tot.in);
             sum.children[1].querySelector('.summary__val').textContent = money(tot.out);
           }
-          if (holder) { /* no-op */ }
         });
       }
     }
     if (screen === 'login') {
-      var pass = root.querySelector('#f-pass');
-      if (pass) {
-        pass.addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
-        var user = root.querySelector('#f-user');
-        if (user) user.addEventListener('keydown', function (e) { if (e.key === 'Enter') pass.focus(); });
-      }
+      var pass = root.querySelector('#f-pass'), user = root.querySelector('#f-user');
+      if (pass) pass.addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+      if (user && pass) user.addEventListener('keydown', function (e) { if (e.key === 'Enter') pass.focus(); });
     }
   }
 
-  /* ---------------------------------------------------------------- 16. Действия */
+  /* ---------------------------------------------------------------- 16. Actions */
   var ACTIONS = {
-    /* — вход/выход — */
+    /* — auth — */
     login: doLogin,
     'login-clear': function () { $('#f-user').value = ''; $('#f-pass').value = ''; },
     'toggle-pass': function (el) {
-      var p = $('#f-pass');
-      var show = p.type === 'password';
+      var p = $('#f-pass'), show = p.type === 'password';
       p.type = show ? 'text' : 'password';
       el.innerHTML = icon(show ? 'eyeOff' : 'eye');
     },
-    forgot: function () { toast('В демо-версии восстановление недоступно'); },
+    forgot: function () { toast('Account recovery is not available in this demo'); },
     logout: function () {
-      openSheet('Выйти из приложения?',
-        '<p class="t-body" style="color:var(--ink-2);margin-bottom:16px">Сессия будет закрыта. Данные макета сохранятся.</p>' +
-        '<div class="btnrow"><button class="btn btn--ghost" data-action="sheet-close">Остаться</button>' +
-        '<button class="btn btn--primary" data-action="logout-yes">Выйти</button></div>');
+      openSheet('Log out?',
+        '<p class="t-body" style="color:var(--ink-2);margin-bottom:16px">Your session will end. The mockup data stays as it is.</p>' +
+        '<div class="btnrow"><button class="btn btn--ghost" data-action="sheet-close">Stay</button>' +
+        '<button class="btn btn--primary" data-action="logout-yes">Log out</button></div>');
     },
     'logout-yes': function () {
       closeSheet();
@@ -961,10 +949,10 @@
       S.stack = [];
       save();
       go('login', {}, 'fade');
-      setTimeout(function () { toast('Вы вышли из приложения'); }, 340);
+      setTimeout(function () { toast('You have been logged out'); }, 340);
     },
 
-    /* — навигация — */
+    /* — navigation — */
     tab: function (el) {
       var id = el.dataset.id;
       if (id === S.screen) { viewport.querySelector('.screen').scrollTo({ top: 0, behavior: 'smooth' }); return; }
@@ -997,29 +985,29 @@
       go('transact', {}, 'fade');
     },
 
-    /* — дашборд — */
+    /* — dashboard — */
     hide: function () { S.hide = !S.hide; save(); repaint(); },
-    inbox: function () { toast('167 непрочитанных сообщений'); },
-    assistant: function () { toast('AI-ассистент появится в следующей версии'); },
+    inbox: function () { toast('167 unread messages'); },
+    assistant: function () { toast('The AI assistant is coming in a later version'); },
     product: function (el) {
       var p = PRODUCTS.filter(function (x) { return x.id === el.dataset.id; })[0];
-      toast(p.on ? 'Вы уже в разделе «Банк»' : 'Продукт «' + p.label + '» пока не подключён');
+      toast(p.on ? 'You are already in Bank' : p.label + ' is not linked to this profile yet');
     },
-    momentum: function () { toast('Статус Bronze · до Silver осталось 2 привычки'); },
+    momentum: function () { toast('Bronze Status · 2 more behaviours to reach Silver'); },
     behaviour: function (el) {
       var b = DB.BEHAVIOURS.filter(function (x) { return x.id === el.dataset.id; })[0];
-      toast(b.label + ' — выполнено на ' + b.p + '%');
+      toast(b.label + ' — ' + b.p + '% complete');
     },
-    soon: function () { toast('Раздел недоступен в макете'); },
+    soon: function () { toast('This section is not part of the mockup'); },
     profile: function () {
-      openSheet('Профиль',
+      openSheet('Profile',
         '<div class="kvlist" style="padding:0">' +
-        [['Имя', DB.USER.first + ' ' + DB.USER.last],
-         ['Клиент №', DB.USER.client],
-         ['ID', DB.USER.idMasked],
-         ['E-mail', DB.USER.emailMasked],
-         ['Телефон', DB.USER.phoneMasked],
-         ['Адрес', DB.USER.address.join(', ')]].map(function (r) {
+        [['Name', DB.USER.first + ' ' + DB.USER.last],
+         ['Client no.', DB.USER.client],
+         ['ID number', DB.USER.idMasked],
+         ['Email', DB.USER.emailMasked],
+         ['Mobile', DB.USER.phoneMasked],
+         ['Address', DB.USER.address.join(', ')]].map(function (r) {
           return '<div class="kv"><span class="kv__k">' + r[0] + '</span><span class="kv__v">' + esc(r[1]) + '</span></div>';
         }).join('') + '</div>');
     },
@@ -1027,44 +1015,44 @@
       S.frozen = !S.frozen;
       save();
       repaint();
-      toast(S.frozen ? 'Карта заморожена' : 'Карта разблокирована');
+      toast(S.frozen ? 'Card frozen' : 'Card unfrozen');
     },
     details: function (el) {
       var a = DB.account(el.dataset.id);
-      openSheet('Реквизиты счёта',
+      openSheet('Account details',
         '<div class="kvlist" style="padding:0">' +
-        [['Получатель', DB.USER.first + ' ' + DB.USER.last],
-         ['Банк', DB.BANK.legal],
-         ['Счёт', a.number],
-         ['Тип', a.type],
-         ['Код филиала', DB.BANK.branch],
+        [['Beneficiary', DB.USER.first + ' ' + DB.USER.last],
+         ['Bank', DB.BANK.legal],
+         ['Account', a.number],
+         ['Type', a.type],
+         ['Branch code', DB.BANK.branch],
          ['SWIFT', DB.BANK.swift]].map(function (r) {
           return '<div class="kv"><span class="kv__k">' + r[0] + '</span><span class="kv__v num">' + esc(r[1]) + '</span></div>';
         }).join('') + '</div>' +
-        '<button class="btn btn--primary btn--wide" style="margin-top:16px" data-action="copy">Скопировать реквизиты</button>');
+        '<button class="btn btn--primary btn--wide" style="margin-top:16px" data-action="copy">Copy details</button>');
     },
-    copy: function () { closeSheet(); toast('Реквизиты скопированы'); },
+    copy: function () { closeSheet(); toast('Account details copied'); },
 
-    /* — история — */
+    /* — history — */
     tx: function (el) { openTx(el.dataset.id); },
-    proof: function () { closeSheet(); toast('Подтверждение отправлено на e-mail'); },
+    proof: function () { closeSheet(); toast('Proof of payment sent by email'); },
     m: function (el) { S.tx.month = el.dataset.id; repaint(); },
     a: function (el) { S.tx.account = el.dataset.id; repaint(); },
     'filter-sheet': function () {
-      openSheet('Фильтры',
-        '<p class="t-cap" style="margin-bottom:12px">Сбросить месяц, счёт и строку поиска.</p>' +
-        '<button class="btn btn--ghost btn--wide" data-action="filter-reset">Сбросить фильтры</button>');
+      openSheet('Filters',
+        '<p class="t-cap" style="margin-bottom:12px">Clear the month, account and search term.</p>' +
+        '<button class="btn btn--ghost btn--wide" data-action="filter-reset">Reset filters</button>');
     },
     'filter-reset': function () {
       S.tx = { q: '', month: 'all', account: 'all' };
       closeSheet();
       repaint();
-      toast('Фильтры сброшены');
+      toast('Filters cleared');
     },
 
-    /* — заказ выписки — */
+    /* — statement order — */
     'pick-account': function () {
-      openSheet('Выберите счёт', DB.ACCOUNTS.map(function (a) {
+      openSheet('Select an account', DB.ACCOUNTS.map(function (a) {
         return '<button class="check" role="radio" aria-checked="' + (S.order.accountId === a.id) + '" data-action="set-account" data-id="' + a.id + '">' +
           '<span class="radio"></span><span class="picker__body">' +
           '<span class="check__t">' + esc(a.name) + '</span>' +
@@ -1092,7 +1080,7 @@
     'd-app': function () { S.order.delivery = 'app'; repaint(); },
     'submit-order': submitOrder,
 
-    /* — выписки — */
+    /* — statements — */
     quick: function (el) {
       var t = DB.TODAY;
       var from = monthStart(t.getFullYear(), t.getMonth() - 2);
@@ -1116,23 +1104,22 @@
     'open-doc': function (el) {
       var r = S.requests.filter(function (x) { return x.id === el.dataset.id; })[0];
       if (!r) return;
-      if (r.status !== 'ready') { toast('Выписка ещё готовится'); return; }
+      if (r.status !== 'ready') { toast('Your statement is still being prepared'); return; }
       go('doc', { id: r.id }, 'push');
     },
-    'send-doc': function () { toast('Выписка отправлена на ' + DB.USER.emailMasked); },
+    'send-doc': function () { toast('Statement sent to ' + DB.USER.emailMasked); },
     print: function () { window.print(); },
 
-    /* — шит — */
+    /* — sheet — */
     'sheet-close': closeSheet
   };
 
   function monthSheet(which) {
-    var months = DB.monthList();
-    openSheet(which === 'from' ? 'Начало периода' : 'Конец периода',
-      months.map(function (m) {
+    openSheet(which === 'from' ? 'Start of period' : 'End of period',
+      DB.monthList().map(function (m) {
         return '<button class="check" data-action="set-' + which + '" data-id="' + m.year + '-' + m.month + '">' +
           '<span class="radio"></span><span class="picker__body"><span class="check__t">' +
-          MON_NOM[m.month] + ' ' + m.year + '</span></span></button>';
+          MONTHS[m.month] + ' ' + m.year + '</span></span></button>';
       }).join(''));
   }
   ACTIONS['set-from'] = function (el) {
@@ -1146,7 +1133,7 @@
     closeSheet(); repaint();
   };
 
-  /* ---------------------------------------------------------------- 17. Делегирование */
+  /* ---------------------------------------------------------------- 17. Delegation */
   document.addEventListener('click', function (e) {
     var el = e.target.closest('[data-action]');
     if (!el) return;
@@ -1160,7 +1147,7 @@
     if (e.key === 'Escape' && sheetOpen) closeSheet();
   });
 
-  /* ---------------------------------------------------------------- 18. Старт */
+  /* ---------------------------------------------------------------- 18. Boot */
   load();
   S.order = defaultOrder();
   S.screen = S.authed ? 'home' : 'login';
@@ -1169,7 +1156,7 @@
   var clock = $('#clock');
   function tick() {
     var d = new Date();
-    clock.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    clock.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
   tick();
   setInterval(tick, 20000);
