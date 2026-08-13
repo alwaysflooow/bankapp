@@ -13,6 +13,10 @@
 
   var STORE_KEY = 'discovery-mock-v1';
 
+  /* Бесплатные выписки в месяц. Заказ ничем не ограничен — цифра только
+     показывается в форме, счётчик до неё не блокирует кнопку. */
+  var FREE_STATEMENTS = 15;
+
   /* ---------------------------------------------------------------- 1. State */
   var S = {
     screen: 'login',
@@ -631,8 +635,9 @@
       check('d-email', o.delivery === 'email', 'By email', DB.USER.emailMasked, 'radio') +
       check('d-app', o.delivery === 'app', 'In the app', 'Kept for 12 months', 'radio') +
 
-      '<div class="note">Your first 3 statements each month are <b>free</b>. Used ' +
-        Math.min(3, S.requests.length) + ' of 3. Ready within 2 minutes.</div>' +
+      '<div class="note">Your first ' + FREE_STATEMENTS + ' statements each month are <b>free</b>. Used ' +
+        Math.min(FREE_STATEMENTS, S.requests.length) + ' of ' + FREE_STATEMENTS +
+        '. Ready within 2 minutes.</div>' +
 
       '<div style="margin-top:18px"><button class="btn btn--primary btn--wide" data-action="submit-order">' +
         'Order statement</button></div>' +
@@ -768,9 +773,7 @@
         '<td class="num">' + dPlain(t.date) + '</td>' +
         '<td class="num">' + (t.card ? '***' + esc(t.card) : '') + '</td>' +
         '<td>' + esc(t.type) + '</td>' +
-        '<td>' + esc(t.merchant) +
-          (t.note && t.note.indexOf('Payslip') === 0
-            ? '<span class="st__note">' + esc(t.note.toLowerCase()) + '</span>' : '') + '</td>' +
+        '<td>' + esc(t.merchant) + '</td>' +
         '<td class="st__vatcell">' + (t.category === 'fees' ? feeMark : '') + '</td>' +
         '<td class="r num">' + docAmt(t.amount) + '</td>' +
       '</tr>';

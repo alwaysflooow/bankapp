@@ -14,7 +14,11 @@ const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 const html = read('index.html');
 const body = html.slice(html.indexOf('<body>') + 6, html.indexOf('</body>'));
 
-const css = read('assets/styles.css');
+// шрифт бланка выписки вшиваем в CSS: одиночный файл должен работать
+// и без соседних папок
+const fontB64 = fs.readFileSync(path.join(root, 'assets/fonts/open-sans.woff2')).toString('base64');
+const css = read('assets/styles.css')
+  .replace("url('fonts/open-sans.woff2')", `url(data:font/woff2;base64,${fontB64})`);
 const js = ['assets/icons.js', 'assets/data.js', 'assets/app.js'].map(read).join('\n');
 
 const out =

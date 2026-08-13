@@ -5,6 +5,16 @@
    с многослойной мягкой тенью, hairline-разделители с отступом под иконку.
    ========================================================================= */
 
+/* Open Sans для бланка выписки. Файл лежит рядом, поэтому документ
+   выглядит одинаково и офлайн, и на любом хостинге. */
+@font-face{
+  font-family:'Open Sans';
+  src:url('fonts/open-sans.woff2') format('woff2');
+  font-weight:300 800;
+  font-style:normal;
+  font-display:swap;
+}
+
 /* ---------- 1. Токены ---------------------------------------------------- */
 :root{
   /* краски текста — плотные чернила, не альфы */
@@ -65,6 +75,7 @@
 
   --ease: cubic-bezier(.32,.72,0,1);
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-doc: 'Open Sans', 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 /* ---------- 2. Сброс ----------------------------------------------------- */
@@ -703,33 +714,39 @@ h1,h2,h3,p{ margin:0; }
 /* ---------- 21. Бланк выписки -------------------------------------------- */
 /* Повторяет форму документа Discovery: знак справа сверху, заголовок,
    TAX INVOICE, две колонки, градиентная линейка, таблица проводок. */
-.st{ padding:20px 18px 24px; color:var(--ink); }
+.st{
+  padding:20px 18px 24px; color:var(--ink);
+  font-family:var(--font-doc);
+  /* в бланке ровно два начертания: regular и bold */
+  font-weight:400;
+}
+.st b,.st th,.st h1,.st .st__tax,.st .st__h2,.st .st__bold td{ font-weight:700; }
 .st__logo{
   display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-bottom:20px;
   color:#141414;
 }
 .st__logo svg{ width:34px; height:34px; flex:0 0 34px; }
-.st__logo b{ display:block; font-size:21px; line-height:23px; font-weight:600; letter-spacing:-.5px; }
-.st__logo i{ display:block; font-style:normal; font-size:14.5px; line-height:17px; font-weight:600; letter-spacing:-.3px; }
+.st__logo b{ display:block; font-size:21px; line-height:23px; font-weight:700; letter-spacing:-.5px; }
+.st__logo i{ display:block; font-style:normal; font-size:14.5px; line-height:17px; font-weight:700; letter-spacing:-.3px; }
 
-.st__h1{ font-size:18px; line-height:24px; font-weight:620; letter-spacing:-.35px; }
-.st__tax{ margin-top:10px; font-size:13px; font-weight:620; letter-spacing:.1px; }
+.st__h1{ font-size:18px; line-height:24px; font-weight:700; letter-spacing:-.35px; }
+.st__tax{ margin-top:10px; font-size:13px; font-weight:700; letter-spacing:.1px; }
 .st__cols{ margin-top:12px; display:grid; grid-template-columns:0.85fr 1.25fr; gap:14px; }
 .st__addr{ font-size:11.5px; line-height:17px; }
 .st__meta{ display:flex; flex-direction:column; gap:4px; }
 .st__mrow{ display:flex; justify-content:space-between; gap:10px; font-size:11.5px; line-height:17px; }
-.st__mrow b{ font-weight:450; }
+.st__mrow b{ font-weight:400; }
 .st__rule{ height:1.5px; background:var(--rule); margin:16px 0 14px; }
 .st__rule--foot{ margin:20px 0 10px; }
 
-.st__h2{ font-size:14.5px; font-weight:620; letter-spacing:-.2px; margin-bottom:8px; }
+.st__h2{ font-size:14.5px; font-weight:700; letter-spacing:-.2px; margin-bottom:8px; }
 .st__h2--tt{ margin-top:18px; }
 .st__srow{
   display:grid; grid-template-columns:auto 1fr auto; gap:8px;
   font-size:11.5px; line-height:19px;
 }
 .st__srow .st__r{ text-align:right; }
-.st__acc{ margin-top:9px; display:flex; gap:14px; font-size:11.5px; font-weight:620; }
+.st__acc{ margin-top:9px; display:flex; gap:14px; font-size:11.5px; font-weight:700; }
 
 /* строки выписки не должны ломаться: таблица шире экрана и прокручивается
    внутри своего контейнера, страница вбок при этом не едет */
@@ -738,14 +755,14 @@ h1,h2,h3,p{ margin:0; }
 /* дата, карта и тип не переносятся — строка выписки читается одной строкой */
 .st__table td:nth-child(1),.st__table td:nth-child(2),.st__table td:nth-child(3){ white-space:nowrap; }
 .st__table th{
-  padding:6px 3px; text-align:left; font-weight:620;
+  padding:6px 3px; text-align:left; font-weight:700;
   border-top:1.5px solid var(--ink); border-bottom:1px solid var(--line-2);
 }
 .st__table td{ padding:6px 3px; vertical-align:top; }
 .st__table .r{ text-align:right; }
 .st__table td.r,.st__table td.num{ white-space:nowrap; }
 .st__table td:nth-child(4){ white-space:normal; overflow-wrap:anywhere; }
-.st__bold td{ font-weight:620; }
+.st__bold td{ font-weight:700; }
 .st__note{ display:block; font-size:9.5px; line-height:13px; color:var(--ink-2); }
 .st__vatcell{ width:16px; padding:6px 0 !important; }
 .st__vatmark{

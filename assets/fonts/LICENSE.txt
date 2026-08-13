@@ -1,0 +1,8 @@
+Open Sans — Copyright 2020 The Open Sans Project Authors
+(https://github.com/googlefonts/opensans)
+
+Licensed under the Apache License, Version 2.0.
+http://www.apache.org/licenses/LICENSE-2.0
+
+Файл open-sans.woff2 — вариативная latin-версия из Google Fonts,
+покрывает начертания от 300 до 800 (в макете используются 400 и 700).

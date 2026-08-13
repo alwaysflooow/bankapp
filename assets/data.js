@@ -166,15 +166,15 @@
   var SWIFT_CODES = ['RO26Wq4Lm10', 'RO26Vb7Nx40', 'RO26T6F720', 'RO26Sbb130', 'RO26Rq0Kr0',
                      'RO26R9Mcj0', 'RO26Qdnl60', 'RO26Pphg90', 'RO26M1L920', 'RO26Kt3Vd80'];
 
-  function swift(y, m, d, amount, weeks) {
+  function swift(y, m, d, amount) {
     var code = SWIFT_CODES[swiftSeq++ % SWIFT_CODES.length];
     return add(at(y, m, d, 'EFT'), 'EFT', '', 'Inward SWIFT ' + code + ' Wise Payments',
-      amount, 'income', { note: 'Payslip weeks ' + weeks, from: 'Wise Payments' });
+      amount, 'income', { from: 'Wise Payments' });
   }
 
   /* зарплатные поступления раз в две недели */
-  swift(2026, 2, 21, 29148.63, '7-8');
-  swift(2026, 3, 4, 30112.45, '9-10');
+  swift(2026, 2, 21, 29148.63);
+  swift(2026, 3, 4, 30112.45);
 
   /* регулярные списания */
   add(at(2026, 2, 20, 'Online'), 'Online', '9441', 'Netflix Za', -99.00, 'entertain');
@@ -210,7 +210,7 @@
     [15, 3, 'POS Purchase', '2740', 'Sasol Rietfontein', -56.50, 'transport'],
     [16, 3, 'POS Purchase', '2740', 'Superspar The Squar', -16.24, 'groceries'],
     [18, 3, 'POS Purchase', '2740', 'Yoco *Plato Boksb', -55.20, 'dining'],
-    [18, 3, 'EFT', '', 'Inward SWIFT RO26T6F720 Wise Payments', 31725.61, 'income', 'Payslip weeks 11-12'],
+    [18, 3, 'EFT', '', 'Inward SWIFT RO26T6F720 Wise Payments', 31725.61, 'income'],
     [18, 3, 'POS Purchase', '9441', 'Mrd', -158.40, 'other'],
     [18, 3, 'POS Purchase', '2740', 'Superspar The Squar', -223.04, 'groceries'],
     [20, 3, 'POS Purchase', '2740', 'Superspar The Squar', -120.65, 'groceries'],
@@ -229,7 +229,7 @@
     [2, 4, 'POS Purchase', '2740', 'Xpresso 19', -20.00, 'dining'],
     [2, 4, 'POS Purchase', '2740', 'Sasol Rietfontein', -130.00, 'transport'],
     [4, 4, 'POS Purchase', '2740', 'Cappello Boksburg10', -286.49, 'dining'],
-    [5, 4, 'EFT', '', 'Inward SWIFT RO26Sbb130 Wise Payments', 28213.51, 'income', 'Payslip weeks 13-14'],
+    [5, 4, 'EFT', '', 'Inward SWIFT RO26Sbb130 Wise Payments', 28213.51, 'income'],
     [5, 4, 'POS Purchase', '2740', 'Postnet East Rand C', -21.00, 'other'],
     [5, 4, 'POS Purchase', '9441', 'DI New Uber Eats', -136.28, 'dining'],
     [6, 4, 'POS Purchase', '2740', 'Neva Neolin', -187.05, 'other'],
@@ -242,7 +242,7 @@
     [12, 4, 'POS Purchase', '2740', "Lotus'S 6447 Koh Ph", -407.54, 'groceries'],
     [14, 4, 'EFT', '', 'International Cash 25250.00 Lotus', -13329.60, 'cash'],
     [15, 4, 'POS Purchase', '9441', 'Kiteflip.Co', -2182.61, 'shopping'],
-    [19, 4, 'EFT', '', 'Inward SWIFT RO26Rq0Kr0 Wise Payments', 30550.21, 'income', 'Payslip weeks 15-16'],
+    [19, 4, 'EFT', '', 'Inward SWIFT RO26Rq0Kr0 Wise Payments', 30550.21, 'income'],
     [20, 4, 'POS Purchase', '2740', '711 Hatchaophao', -123.94, 'groceries'],
     [20, 4, 'EFT', '', 'Rent Boksburgirene', -4990.00, 'home'],
     [20, 4, 'Online', '9441', 'Netflix Za', -99.00, 'entertain'],
@@ -261,7 +261,7 @@
     [3, 5, 'EFT', '', 'Sussa', -650.00, 'other'],
     [3, 5, 'EFT', '', 'Payshap Account Off-Us Emergency Funds.', -1000.00, 'transfers'],
     [3, 5, 'POS Purchase', '2740', 'S2S*Valuecobayside', -3100.00, 'shopping'],
-    [4, 5, 'EFT', '', 'Inward SWIFT RO26R9Mcj0 Wise Payments', 29374.28, 'income', 'Payslip weeks 17-18'],
+    [4, 5, 'EFT', '', 'Inward SWIFT RO26R9Mcj0 Wise Payments', 29374.28, 'income'],
     [4, 5, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -180.61, 'dining'],
     [4, 5, 'EFT', '', 'Off-Us Debt', -7100.00, 'debt'],
     [5, 5, 'POS Purchase', '2740', "Lotus'S 6447 Koh Ph", -724.39, 'groceries'],
@@ -271,7 +271,7 @@
     [8, 5, 'EFT', '', 'International Cash 13250.00 Koh P', -6934.60, 'cash'],
     [17, 5, 'EFT', '', 'Travel', -12000.00, 'travel'],
     [17, 5, 'Transfer', '2740', 'Savings For 90 Days', 5000.00, 'savings'],
-    [18, 5, 'EFT', '9441', 'Inward SWIFT RO26Qdnl60 Wise Payments', 29375.28, 'income', 'Payslip weeks 19-20'],
+    [18, 5, 'EFT', '9441', 'Inward SWIFT RO26Qdnl60 Wise Payments', 29375.28, 'income'],
     [18, 5, 'POS Purchase', '', 'Zama Resort Koh Pha', -159.33, 'dining'],
     [19, 5, 'Online', '9441', 'Netflix Za', -99.00, 'entertain'],
     [19, 5, 'EFT', '', 'International Cash 10250.00 7-11', -5267.99, 'cash'],
@@ -286,7 +286,7 @@
     [1, 6, 'EFT', '', 'Debt', -2000.00, 'debt'],
     [2, 6, 'EFT', '', 'International Cash 30250.00 7-11', -15429.19, 'cash'],
     [4, 6, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -300.45, 'dining'],
-    [5, 6, 'EFT', '', 'Inward SWIFT RO26Pphg90 Wise Payments', 25852.12, 'income', 'Payslip weeks 21-22'],
+    [5, 6, 'EFT', '', 'Inward SWIFT RO26Pphg90 Wise Payments', 25852.12, 'income'],
     [7, 6, 'Fee', '', 'Monthly Account Fee', -285.00, 'fees'],
     [7, 6, 'Fee', '', 'Service Fees', -425.00, 'fees'],
     [9, 6, 'POS Purchase', '2740', "Lotus'S 6447 Koh Ph", -500.89, 'groceries'],
@@ -294,7 +294,7 @@
     [15, 6, 'Transfer', '', 'Savings For 90 Days', -25000.00, 'savings'],
     [16, 6, 'Online', '9441', 'Netflix Za', -99.00, 'entertain'],
     [18, 6, 'POS Purchase', '2740', '7 11 Ban Sithanu', -120.73, 'groceries'],
-    [19, 6, 'EFT', '', 'Inward SWIFT RO26M1L920 Wise Payments', 32898.88, 'income', 'Payslip weeks 23-24'],
+    [19, 6, 'EFT', '', 'Inward SWIFT RO26M1L920 Wise Payments', 32898.88, 'income'],
     [20, 6, 'EFT', '', 'International Cash 10250.00 7-11', -5267.99, 'cash'],
     [22, 6, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -250.60, 'dining'],
     [24, 6, 'POS Purchase', '9441', '7 11 Kophangan Serv', -110.42, 'groceries'],
@@ -326,7 +326,7 @@
   add(at(2026, 7, 11, 'Online'), 'Online', '9441', 'Netflix Za', -99.00, 'entertain');
   add(at(2026, 7, 12, 'EFT'), 'EFT', '', 'International Cash 12250.00 Samui', -6318.47, 'cash');
   add(new Date(2026, 7, 13, 7, 22), 'EFT', '', 'Inward SWIFT RO26Kt3Vd80 Wise Payments', 28717.18, 'income',
-    { note: 'Payslip weeks 25-26', from: 'Wise Payments' });
+    { from: 'Wise Payments' });
 
   /* подгоночный перевод в накопления — считается решателем ниже */
   var closingTx = add(new Date(2026, 7, 13, 9, 40), 'Transfer', '', 'Savings For 90 Days',
