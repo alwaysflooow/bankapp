@@ -198,11 +198,8 @@
 
   /* ---------------------------------------------------------------- 5. Screen: log in */
   function renderLogin() {
+    // Логотипа на экране входа нет — так же, как в референсном приложении
     return '<div class="login">' +
-      '<div class="login__brand">' +
-        '<span class="login__mark">' + icon('mark', { w: 1.3 }) + '</span>' +
-        '<span class="login__name">' + DB.BANK.name + '</span>' +
-      '</div>' +
       '<div class="field">' +
         '<input class="field__input" id="f-user" type="text" placeholder="Username" autocomplete="username" spellcheck="false">' +
         '<button class="field__link" data-action="forgot">Forgot username?</button>' +
