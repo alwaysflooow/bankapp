@@ -34,6 +34,10 @@
      обычными чернилами, поэтому отдельной «зелёной» краски нет */
   --debit:        #D5203C;
 
+  /* золото на пластике */
+  --gold:      #B08A57;
+  --gold-soft: #C7A671;
+
   /* сцена «Vitality Money» */
   --bronze-1: #A9603A;
   --bronze-2: #C4804F;
@@ -305,6 +309,7 @@ h1,h2,h3,p{ margin:0; }
 .row__label{ font-size:16.5px; line-height:22px; font-weight:450; letter-spacing:-.1px; }
 .row__sub{ font-size:13px; line-height:18px; color:var(--ink-3); margin-top:1px; }
 .row__meta{ text-align:right; font-size:15px; font-weight:500; }
+.row__meta .num{ white-space:nowrap; }
 .row__chev{ flex:0 0 auto; color:var(--ink-4); }
 .row__chev svg{ width:20px; height:20px; }
 .row--off{ color:var(--ink-4); pointer-events:none; }
@@ -458,9 +463,13 @@ h1,h2,h3,p{ margin:0; }
   color:#8DA5BE;
   background:radial-gradient(120% 92% at 46% 24%, #26527F 0%, #1B3F65 56%, #14304E 100%);
 }
-.plastic__top{ position:relative; display:flex; align-items:center; gap:4px; padding:9px 8px 0; }
-.plastic__top svg{ width:15px; height:15px; }
-.plastic__brand{ font-size:7.5px; font-weight:600; letter-spacing:.1px; }
+.plastic__top{
+  position:relative; display:flex; align-items:center; gap:4px; padding:9px 8px 0;
+  color:var(--gold);
+}
+.plastic__top svg{ width:15px; height:15px; flex:0 0 15px; }
+.plastic__brand b{ display:block; font-size:7.5px; line-height:8px; font-weight:600; letter-spacing:-.1px; }
+.plastic__brand i{ display:block; font-style:normal; font-size:5.5px; line-height:7px; font-weight:600; }
 .plastic__wave{ position:absolute; right:7px; top:9px; width:11px; height:11px; opacity:.75; }
 .plastic__chip{
   position:relative; margin:11px 0 0 9px;
@@ -473,7 +482,7 @@ h1,h2,h3,p{ margin:0; }
   border-left:.5px solid rgba(120,96,40,.5);
   border-right:.5px solid rgba(120,96,40,.5);
 }
-.plastic__mark{ position:relative; margin:9px auto 0; width:34px; height:34px; opacity:.85; }
+.plastic__mark{ position:relative; margin:9px auto 0; width:34px; height:34px; color:var(--gold); opacity:.9; }
 .plastic__foot{
   position:absolute; left:0; right:0; bottom:7px;
   display:flex; align-items:baseline; justify-content:space-between; padding:0 8px;
@@ -693,48 +702,73 @@ h1,h2,h3,p{ margin:0; }
 .spin{ animation:spin 1.1s linear infinite; }
 @keyframes spin{ to{ transform:rotate(360deg) } }
 
-/* ---------- 21. Документ выписки ---------------------------------------- */
-.doc{ padding:0 0 24px; }
-.doc__head{
-  padding:20px 22px 16px; border-bottom:2px solid var(--ink);
-  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+/* ---------- 21. Бланк выписки -------------------------------------------- */
+/* Повторяет форму документа Discovery: знак справа сверху, заголовок,
+   TAX INVOICE, две колонки, градиентная линейка, таблица проводок. */
+.st{ padding:20px 18px 24px; color:var(--ink); }
+.st__logo{
+  display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-bottom:20px;
+  color:#141414;
 }
-.doc__brand{ display:flex; align-items:center; gap:9px; color:var(--magenta); }
-.doc__brand svg{ width:30px; height:30px; }
-.doc__brand b{ font-size:15px; font-weight:620; color:var(--ink); letter-spacing:.1px; }
-.doc__kind{ text-align:right; font-size:12px; line-height:17px; color:var(--ink-3); }
-.doc__kind b{ display:block; font-size:14px; color:var(--ink); font-weight:620; }
-.doc__grid{
-  display:grid; grid-template-columns:1fr 1fr; gap:16px;
-  padding:16px 22px; border-bottom:1px solid var(--line);
+.st__logo svg{ width:34px; height:34px; flex:0 0 34px; }
+.st__logo b{ display:block; font-size:21px; line-height:23px; font-weight:600; letter-spacing:-.5px; }
+.st__logo i{ display:block; font-style:normal; font-size:14.5px; line-height:17px; font-weight:600; letter-spacing:-.3px; }
+
+.st__h1{ font-size:18px; line-height:24px; font-weight:620; letter-spacing:-.35px; }
+.st__tax{ margin-top:10px; font-size:13px; font-weight:620; letter-spacing:.1px; }
+.st__cols{ margin-top:12px; display:grid; grid-template-columns:0.85fr 1.25fr; gap:14px; }
+.st__addr{ font-size:11.5px; line-height:17px; }
+.st__meta{ display:flex; flex-direction:column; gap:4px; }
+.st__mrow{ display:flex; justify-content:space-between; gap:10px; font-size:11.5px; line-height:17px; }
+.st__mrow b{ font-weight:450; }
+.st__rule{ height:1.5px; background:var(--rule); margin:16px 0 14px; }
+.st__rule--foot{ margin:20px 0 10px; }
+
+.st__h2{ font-size:14.5px; font-weight:620; letter-spacing:-.2px; margin-bottom:8px; }
+.st__h2--tt{ margin-top:18px; }
+.st__srow{
+  display:grid; grid-template-columns:auto 1fr auto; gap:8px;
+  font-size:11.5px; line-height:19px;
 }
-.doc__block h4{
-  margin:0 0 6px; font-size:12px; font-weight:620; color:var(--ink-3); letter-spacing:-.05px;
+.st__srow .st__r{ text-align:right; }
+.st__acc{ margin-top:9px; display:flex; gap:14px; font-size:11.5px; font-weight:620; }
+
+/* строки выписки не должны ломаться: таблица шире экрана и прокручивается
+   внутри своего контейнера, страница вбок при этом не едет */
+.st__scroll{ overflow-x:auto; margin:0 -18px; padding:0 18px; }
+.st__table{ min-width:520px; width:100%; border-collapse:collapse; font-size:10.5px; line-height:15px; }
+/* дата, карта и тип не переносятся — строка выписки читается одной строкой */
+.st__table td:nth-child(1),.st__table td:nth-child(2),.st__table td:nth-child(3){ white-space:nowrap; }
+.st__table th{
+  padding:6px 3px; text-align:left; font-weight:620;
+  border-top:1.5px solid var(--ink); border-bottom:1px solid var(--line-2);
 }
-.doc__block p{ font-size:12.5px; line-height:18px; color:var(--ink); }
-.doc__kv{ display:flex; justify-content:space-between; gap:10px; font-size:12.5px; line-height:19px; }
-.doc__kv span{ color:var(--ink-3); }
-.doc__sec{ padding:14px 22px 4px; font-size:13.5px; font-weight:620; }
-.doc__table{ width:100%; border-collapse:collapse; font-size:11.5px; }
-.doc__table th{
-  text-align:left; padding:6px 6px; color:var(--ink-3); font-weight:600;
-  border-bottom:1px solid var(--line-2); white-space:nowrap;
+.st__table td{ padding:6px 3px; vertical-align:top; }
+.st__table .r{ text-align:right; }
+.st__table td.r,.st__table td.num{ white-space:nowrap; }
+.st__table td:nth-child(4){ white-space:normal; overflow-wrap:anywhere; }
+.st__bold td{ font-weight:620; }
+.st__note{ display:block; font-size:9.5px; line-height:13px; color:var(--ink-2); }
+.st__vatcell{ width:16px; padding:6px 0 !important; }
+.st__vatmark{
+  display:inline-grid; place-items:center; width:14px; height:12px;
+  border:1px solid var(--ink-3); border-radius:2px; color:var(--ink-2);
 }
-.doc__table td{ padding:7px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
-.doc__table th:first-child, .doc__table td:first-child{ padding-left:22px; }
-.doc__table th:last-child, .doc__table td:last-child{ padding-right:22px; text-align:right; }
-.doc__table td.r{ text-align:right; white-space:nowrap; }
-.doc__table td.r{ font-variant-numeric:tabular-nums; }
-.doc__tot{
-  margin:14px 22px 0; padding:12px 14px; border-radius:var(--r-md); background:var(--surface-2);
+.st__vatmark svg{ width:9px; height:9px; }
+.st__vat td{ border-top:1.5px solid var(--ink); padding-top:8px; }
+.st__vatlbl{ margin-left:6px; }
+
+.st__holders{ margin-top:22px; padding-top:12px; border-top:1px solid var(--line-2); }
+.st__hrow{ display:flex; gap:40px; font-size:11.5px; line-height:20px; }
+.st__hrow span:first-child{ min-width:64px; }
+
+.st__foot{ position:relative; font-size:10px; line-height:15px; color:var(--ink-2); }
+.st__foot p{ margin-top:3px; padding-right:56px; }
+.st__seal{
+  position:absolute; right:0; bottom:0; width:52px; height:52px;
+  color:var(--magenta); opacity:.28;
 }
-.doc__tot .doc__kv{ font-size:13px; line-height:22px; }
-.doc__tot .doc__kv b{ font-weight:620; }
-.doc__foot{ padding:16px 22px 0; font-size:11px; line-height:17px; color:var(--ink-3); }
-.bars{ margin:10px 22px 0; display:flex; flex-direction:column; gap:8px; }
-.bar__top{ display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:3px; }
-.bar__track{ height:7px; border-radius:var(--r-round); background:var(--surface-3); overflow:hidden; }
-.bar__fill{ height:100%; border-radius:var(--r-round); background:var(--navy); }
+.st__seal svg{ width:52px; height:52px; }
 
 .docbar{
   position:sticky; bottom:0; z-index:3;
@@ -742,6 +776,10 @@ h1,h2,h3,p{ margin:0; }
   padding:12px 20px; background:var(--surface);
   box-shadow:0 -8px 20px -14px rgba(16,23,32,.4);
 }
+.bars{ display:flex; flex-direction:column; gap:8px; }
+.bar__top{ display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:3px; }
+.bar__track{ height:6px; border-radius:var(--r-round); background:var(--surface-3); overflow:hidden; }
+.bar__fill{ height:100%; border-radius:var(--r-round); background:var(--navy); }
 
 /* ---------- 22. Шит ------------------------------------------------------ */
 .sheet-layer{ position:absolute; inset:0; z-index:40; }
@@ -785,9 +823,9 @@ h1,h2,h3,p{ margin:0; }
 .toast--out{ animation:toast-out .22s var(--ease) both; }
 .toast__mark{
   flex:0 0 26px; width:26px; height:26px; border-radius:50%;
-  background:#fff; color:var(--magenta); display:grid; place-items:center;
+  overflow:hidden; color:var(--magenta); display:grid; place-items:center;
 }
-.toast__mark svg{ width:17px; height:17px; }
+.toast__mark svg{ width:26px; height:26px; }
 .phone--notabs .toast-layer{ bottom:18px; }
 @keyframes toast-in { from{ transform:translateY(14px) scale(.96); opacity:0 } to{ transform:none; opacity:1 } }
 @keyframes toast-out{ from{ transform:none; opacity:1 } to{ transform:translateY(8px); opacity:0 } }
@@ -796,11 +834,16 @@ h1,h2,h3,p{ margin:0; }
 .cards-hero{ padding:16px 20px 4px; display:flex; flex-direction:column; align-items:center; gap:16px; }
 .plastic--big{ width:246px; height:156px; border-radius:14px; }
 .plastic--big .plastic__top{ padding:14px 14px 0; gap:6px; }
-.plastic--big .plastic__top svg{ width:22px; height:22px; }
-.plastic--big .plastic__brand{ font-size:11px; }
+.plastic--big .plastic__top svg{ width:26px; height:26px; flex:0 0 26px; }
+.plastic--big .plastic__brand b{ font-size:13px; line-height:14px; }
+.plastic--big .plastic__brand i{ font-size:9.5px; line-height:11px; }
 .plastic--big .plastic__chip{ width:34px; height:26px; margin:16px 0 0 14px; border-radius:5px; }
 .plastic--big .plastic__wave{ right:13px; top:15px; width:16px; height:16px; }
-.plastic--big .plastic__mark{ display:none; }
+.plastic--big .plastic__mark{
+  display:block; position:absolute; left:50%; top:46%;
+  width:64px; height:64px; margin:0; transform:translate(-50%,-50%);
+  color:var(--gold); opacity:.5;
+}
 .plastic--big .plastic__foot{ bottom:12px; padding:0 14px; }
 .plastic--big .plastic__net{ font-size:17px; }
 .plastic--big .plastic__tier{ font-size:9px; }
@@ -829,6 +872,9 @@ h1,h2,h3,p{ margin:0; }
   body{ background:#fff; }
   .stage{ padding:0; }
   .stage__hint, .statusbar, .appbar, .tabbar, .docbar, .toast-layer, .sheet-layer{ display:none !important; }
+  /* на бумаге таблица разворачивается целиком, прокрутка не нужна */
+  .st__scroll{ overflow:visible; margin:0; padding:0; }
+  .st__table{ min-width:0; }
   .device{ max-width:none; width:auto; height:auto; border-radius:0; box-shadow:none; }
   .phone{ height:auto; }
   .viewport{ overflow:visible; }
@@ -943,14 +989,32 @@ h1,h2,h3,p{ margin:0; }
     wave:      '<path d="M6 8.4a6 6 0 0 1 0 7.2M9.6 6.2a10 10 0 0 1 0 11.6M13.2 4.4a13.6 13.6 0 0 1 0 15.2"/>'
   };
 
-  /* Фирменный знак — двойной шеврон Discovery.
-     Это приближение по форме: перед сдачей замените путь на официальный SVG
-     из брендбука (см. README, раздел «Как поменять бренд»). */
-  var MARK = '<path d="M4.6 6.8 12 14.1l7.4-7.3"/><path d="M4.6 12.4 12 19.7l7.4-7.3"/>';
+  /* Фирменный знак: кольцо, ромб и шеврон под ним — нарисован по образцам
+     из брендбука. Заливка сплошная, поэтому пути несут собственные
+     fill/stroke и не подчиняются обводке обёртки. */
+  var MARK =
+    '<circle cx="12" cy="12" r="9.6" fill="none" stroke="currentColor" stroke-width="2.4"/>' +
+    '<path fill="currentColor" stroke="none" d="M12 5.9 14.05 7.95 12 10 9.95 7.95Z"/>' +
+    '<path fill="currentColor" stroke="none" d="M4.5 9.8 12 17.3 19.5 9.8 16.6 6.9 12 11.5 7.4 6.9Z"/>';
+
+  /* Плашечная версия: залитый круг, знак вырезан белым — так знак стоит
+     в шапке выписки и в тостах */
+  var MARK_SOLID =
+    '<circle cx="12" cy="12" r="11" fill="currentColor" stroke="none"/>' +
+    '<path fill="#fff" stroke="none" d="M12 5.6 14.15 7.75 12 9.9 9.85 7.75Z"/>' +
+    '<path fill="#fff" stroke="none" d="M4.2 9.6 12 17.4 19.8 9.6 16.8 6.6 12 11.4 7.2 6.6Z"/>';
+
+  /* Развёрнутая версия для иконки приложения: ромб и два шеврона без кольца */
+  var MARK_FULL =
+    '<path fill="currentColor" stroke="none" d="M12 3.5 14.1 5.6 12 7.7 9.9 5.6Z"/>' +
+    '<path fill="currentColor" stroke="none" d="M6.5 8.1 12 13.6 17.5 8.1 15.2 5.8 12 9 8.8 5.8Z"/>' +
+    '<path fill="currentColor" stroke="none" d="M3.4 12.6 12 21.2 20.6 12.6 18.3 10.3 12 16.6 5.7 10.3Z"/>';
 
   function icon(name, opts) {
     opts = opts || {};
-    var body = name === 'mark' ? MARK : P[name];
+    var body = name === 'mark' ? MARK
+      : name === 'markSolid' ? MARK_SOLID
+      : name === 'markFull' ? MARK_FULL : P[name];
     if (!body) return '';
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' +
       (opts.w || 1.6) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -989,7 +1053,11 @@ h1,h2,h3,p{ margin:0; }
     reg: 'Reg. 2015/408745/06 · FSP 48657 · NCRCP 9997',
     branch: '679000',
     swift: 'DISCZAJJ',
-    address: '1 Discovery Place, Sandton, 2196',
+    address: '1 Discovery Place, Sandhurst, Sandton, PO Box 786722, Sandton, 2196',
+    legalLine: 'Discovery Bank Limited. Registration number 2015/408745/06. ' +
+               'An authorised financial services and registered credit provider. ' +
+               'FSP number 48657. NCR registration number NCRCP9997. ' +
+               'VAT registration number 4590272730. Limits, terms and conditions apply.',
     support: '0800 07 96 97',
     currency: 'ZAR',
     symbol: 'R'
@@ -1005,7 +1073,9 @@ h1,h2,h3,p{ margin:0; }
     emailMasked: 'c•••••.p••••@example.co.za',
     phoneMasked: '+27 •• ••• 2832',
     idMasked: '9207•••••08 2',
-    address: ['24 Rietfontein Road', 'Boksburg', 'Gauteng, 1459'],
+    formal: 'Ms C Puren',
+    cardName: 'Ms Charne Puren',
+    address: ['34 Athens Road', 'Cape Cove Unit 2', 'Waves Edge', 'Cape Town', '7441'],
     client: '4471 0298',
     since: 'June 2021',
     tier: 'Gold'
@@ -1530,7 +1600,7 @@ h1,h2,h3,p{ margin:0; }
   function toast(text, ms) {
     var el = document.createElement('div');
     el.className = 'toast';
-    el.innerHTML = '<span class="toast__mark">' + icon('mark', { w: 1.8 }) + '</span><span>' + esc(text) + '</span>';
+    el.innerHTML = '<span class="toast__mark">' + icon('markSolid') + '</span><span>' + esc(text) + '</span>';
     toastLayer.appendChild(el);
     setTimeout(function () {
       el.classList.add('toast--out');
@@ -1563,10 +1633,11 @@ h1,h2,h3,p{ margin:0; }
   function plastic(acc, big) {
     var cls = 'plastic' + (acc.art === 'dark' ? ' plastic--dark' : acc.art === 'vault' ? ' plastic--vault' : '') + (big ? ' plastic--big' : '');
     return '<div class="' + cls + '">' +
-      '<div class="plastic__top">' + icon('mark', { w: 1.5 }) + '<span class="plastic__brand">Discovery</span></div>' +
+      '<div class="plastic__top">' + icon('mark') +
+        '<span class="plastic__brand"><b>Discovery</b><i>Bank</i></span></div>' +
       '<span class="plastic__wave">' + icon('wave', { w: 1.8 }) + '</span>' +
       '<div class="plastic__chip"></div>' +
-      (big ? '' : '<div class="plastic__mark">' + icon('mark', { w: 1.1 }) + '</div>') +
+      '<div class="plastic__mark">' + icon('mark') + '</div>' +
       (big && acc.pan ? '<div class="plastic__pan">' + esc(acc.pan) + '</div>' : '') +
       '<div class="plastic__foot">' +
         '<span class="plastic__tier">' + esc(acc.tier.toUpperCase()) + '</span>' +
@@ -1950,7 +2021,7 @@ h1,h2,h3,p{ margin:0; }
       '<div class="group" style="margin-top:12px"><div class="group__head">All cards</div>' +
         DB.CARDS.map(function (c) {
           return row({
-            icon: 'cards', label: c.name, sub: c.kind + ' · ' + c.pan,
+            icon: 'cards', label: c.name, sub: c.kind + ' · ***' + c.last4,
             meta: '<span class="num">' + money(a.available) + '</span>',
             action: 'card', id: c.last4
           });
@@ -2132,90 +2203,126 @@ h1,h2,h3,p{ margin:0; }
   }
 
   /* ---------------------------------------------------------------- 12. Statement document */
+  /* Бланк повторяет форму выписки Discovery: знак справа сверху, заголовок,
+     TAX INVOICE, адрес и параметры в две колонки, градиентная линейка,
+     account summary, transaction timeline, строка VAT, держатели карт и
+     подвал с реквизитами банка. */
+
+  /* В документе формат сумм свой: разряды через пробел, минус перед R */
+  function docAmt(v) {
+    var n = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (v < 0 ? '- ' : '') + 'R' + n.replace(/,/g, ' ');
+  }
+  function dPlain(dt) { return dt.getDate() + ' ' + MONTHS[dt.getMonth()] + ' ' + dt.getFullYear(); }
+
+  function docLogo() {
+    return '<div class="st__logo">' + icon('markSolid') +
+      '<span><b>Discovery</b><i>Bank</i></span></div>';
+  }
+
   function renderDoc(p) {
     var r = S.requests.filter(function (x) { return x.id === p.id; })[0];
     if (!r) return '<div class="empty"><p>Statement not found</p></div>';
-    var a = DB.account(r.accountId);
-    var list = DB.txFor(r.accountId, r.from, r.to);
-    var asc = list.slice().reverse();
-    var tot = DB.totals(list);
-    var open = DB.openingBalanceAt(r.accountId, r.from);
+
+    var a = DB.ACCOUNTS[0];
+    var asc = DB.txFor(null, r.from, r.to).slice().reverse();
+    var open = DB.openingBalanceAt(a.id, r.from);
     var close = asc.length ? asc[asc.length - 1].balanceAfter : open;
-    var cats = DB.byCategory(list);
-    var maxCat = cats.length ? cats[0].total : 1;
+    var vat = asc.reduce(function (sum, t) { return t.category === 'fees' ? sum - t.amount : sum; }, 0);
+    // номер выписки: помесячно, май 2026 — пятнадцатая
+    var stNo = (r.to.getFullYear() - 2025) * 12 + (r.to.getMonth() + 1) - 2;
 
     var head =
-      '<div class="doc__head">' +
-        '<div class="doc__brand">' + icon('mark', { w: 1.4 }) + '<b>' + DB.BANK.name + '</b></div>' +
-        '<div class="doc__kind"><b>Bank statement</b>' + esc(r.ref) + '<br>issued ' + dNum(r.created) + '</div>' +
-      '</div>';
+      docLogo() +
+      '<h1 class="st__h1">' + esc(a.name) + ' statement</h1>' +
+      '<div class="st__tax">TAX INVOICE</div>' +
+      '<div class="st__cols">' +
+        '<div class="st__addr">' + esc(DB.USER.formal) + '<br>' +
+          DB.USER.address.map(esc).join('<br>') + '</div>' +
+        '<div class="st__meta">' +
+          [['Statement number', String(stNo)],
+           ['Statement date', dPlain(r.to)],
+           ['Statement period', dPlain(r.from) + ' - ' + dPlain(r.to)],
+           ['Overdraft limit', 'R0.00'],
+           ['Minimum amount due', 'R0.00']].map(function (row) {
+            return '<div class="st__mrow"><span>' + esc(row[0]) + '</span>' +
+              '<b class="num">' + esc(row[1]) + '</b></div>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="st__rule"></div>';
 
-    var details = r.incl.details
-      ? '<div class="doc__grid">' +
-          '<div class="doc__block"><h4>Account holder</h4><p>' + DB.USER.first + ' ' + DB.USER.last + '<br>' +
-            DB.USER.address.map(esc).join('<br>') + '<br>Client no. ' + DB.USER.client + '</p></div>' +
-          '<div class="doc__block"><h4>Bank</h4><p>' + DB.BANK.legal + '<br>' + DB.BANK.address + '<br>' +
-            DB.BANK.reg + '</p></div>' +
-          '<div class="doc__block"><h4>Account</h4>' +
-            '<div class="doc__kv"><span>Name</span><b>' + esc(a.name) + '</b></div>' +
-            '<div class="doc__kv"><span>Number</span><b class="num">' + esc(a.number) + '</b></div>' +
-            '<div class="doc__kv"><span>Type</span><b>' + esc(a.type) + '</b></div>' +
-            '<div class="doc__kv"><span>Branch</span><b class="num">' + DB.BANK.branch + '</b></div>' +
-            '<div class="doc__kv"><span>SWIFT</span><b class="num">' + DB.BANK.swift + '</b></div>' +
-          '</div>' +
-          '<div class="doc__block"><h4>Period</h4>' +
-            '<div class="doc__kv"><span>From</span><b class="num">' + dNum(r.from) + '</b></div>' +
-            '<div class="doc__kv"><span>To</span><b class="num">' + dNum(r.to) + '</b></div>' +
-            '<div class="doc__kv"><span>Currency</span><b>' + DB.BANK.currency + '</b></div>' +
-            '<div class="doc__kv"><span>Transactions</span><b class="num">' + list.length + '</b></div>' +
-          '</div>' +
-        '</div>'
+    var summary = r.incl.details
+      ? '<div class="st__h2">Your account summary</div>' +
+        '<div class="st__srow"><span>Opening balance on</span><span class="num">' + dPlain(r.from) + '</span>' +
+          '<span class="num st__r">' + docAmt(open) + '</span></div>' +
+        '<div class="st__srow"><span>Closing balance on</span><span class="num">' + dPlain(r.to) + '</span>' +
+          '<span class="num st__r">' + docAmt(close) + '</span></div>' +
+        '<div class="st__acc"><b>' + esc(a.name) + '</b><b class="num">' + esc(a.number) + '</b></div>'
       : '';
+
+    var feeMark = '<span class="st__vatmark">' + icon('seal', { w: 2 }) + '</span>';
+
+    var rows = asc.map(function (t) {
+      return '<tr>' +
+        '<td class="num">' + dPlain(t.date) + '</td>' +
+        '<td class="num">' + (t.card ? '***' + esc(t.card) : '') + '</td>' +
+        '<td>' + esc(t.type) + '</td>' +
+        '<td>' + esc(t.merchant) +
+          (t.note && t.note.indexOf('Payslip') === 0
+            ? '<span class="st__note">' + esc(t.note.toLowerCase()) + '</span>' : '') + '</td>' +
+        '<td class="st__vatcell">' + (t.category === 'fees' ? feeMark : '') + '</td>' +
+        '<td class="r num">' + docAmt(t.amount) + '</td>' +
+      '</tr>';
+    }).join('');
 
     var table = r.incl.tx
-      ? '<div class="doc__sec">Transaction history</div>' +
-        '<table class="doc__table"><thead><tr>' +
-          '<th>Date</th><th>Description</th><th>Amount</th><th>Balance</th>' +
+      ? '<div class="st__h2 st__h2--tt">Transaction timeline</div>' +
+        '<div class="st__scroll"><table class="st__table"><thead><tr>' +
+          '<th>Date</th><th>Card no.</th><th>Type</th><th>Details</th><th></th><th class="r">Amount</th>' +
         '</tr></thead><tbody>' +
-        (asc.length ? asc.map(function (t) {
-          return '<tr><td class="num">' + dNum(t.date) + '</td>' +
-            '<td>' + esc(t.merchant) + '<br><span style="color:var(--ink-3)">' +
-              esc(t.type) + (t.card ? ' ***' + esc(t.card) : '') + ' · ' + esc(cat(t.category).label) + ' · ' + esc(t.ref) + '</span></td>' +
-            '<td class="r num">' + amountSigned(t.amount) + '</td>' +
-            '<td class="r num">' + amountSigned(t.balanceAfter) + '</td></tr>';
-        }).join('') : '<tr><td colspan="4" style="padding:16px 22px;color:var(--ink-3)">No transactions for this period</td></tr>') +
-        '</tbody></table>'
+          '<tr class="st__bold"><td></td><td></td><td></td><td>Opening balance</td><td></td>' +
+            '<td class="r num">' + docAmt(open) + '</td></tr>' +
+          rows +
+          '<tr class="st__bold"><td></td><td></td><td></td><td>Closing balance</td><td></td>' +
+            '<td class="r num">' + docAmt(close) + '</td></tr>' +
+          '<tr class="st__vat"><td>Total VAT</td><td class="num">' +
+            vat.toFixed(2) + '</td><td colspan="4">' + feeMark +
+            '<span class="st__vatlbl">= fees charged (VAT incl.)</span></td></tr>' +
+        '</tbody></table></div>'
       : '';
 
-    var summary =
-      '<div class="doc__tot">' +
-        '<div class="doc__kv"><span>Opening balance</span><b class="num">' + amountSigned(open) + '</b></div>' +
-        '<div class="doc__kv"><span>Money in</span><b class="num">' + amount(tot.in) + '</b></div>' +
-        '<div class="doc__kv"><span>Money out</span><b class="num">' + amountSigned(-tot.out) + '</b></div>' +
-        '<div class="doc__kv"><span>Bank fees</span><b class="num">' + amount(tot.fees) + '</b></div>' +
-        '<div class="doc__kv" style="border-top:1px solid var(--line-2);margin-top:6px;padding-top:6px">' +
-          '<span>Closing balance</span><b class="num">' + amountSigned(close) + '</b></div>' +
-      '</div>';
-
+    var cats = DB.byCategory(asc);
+    var maxCat = cats.length ? cats[0].total : 1;
     var catBlock = r.incl.cats && cats.length
-      ? '<div class="doc__sec">Debits by category</div>' +
+      ? '<div class="st__h2 st__h2--tt">Debits by category</div>' +
         '<div class="bars">' + cats.slice(0, 7).map(function (c) {
           return '<div><div class="bar__top"><span>' + esc(cat(c.category).label) + '</span>' +
-            '<span class="num">' + amount(c.total) + '</span></div>' +
-            '<div class="bar__track"><div class="bar__fill" style="width:' + Math.round(c.total / maxCat * 100) + '%"></div></div></div>';
+            '<span class="num">' + docAmt(c.total) + '</span></div>' +
+            '<div class="bar__track"><div class="bar__fill" style="width:' +
+              Math.round(c.total / maxCat * 100) + '%"></div></div></div>';
         }).join('') + '</div>'
       : '';
 
-    var foot = '<div class="doc__foot">This statement was generated automatically on ' + dLong(r.created) +
-      ' and is valid without a signature. ' + DB.BANK.legal + ', ' + DB.BANK.reg +
-      '. Queries: ' + DB.BANK.support + '. This is a design mockup — all data is fictional.</div>';
+    var holders = '<div class="st__holders">' + DB.CARDS.map(function (c) {
+      return '<div class="st__hrow"><span class="num">***' + esc(c.last4) + '</span>' +
+        '<span>' + esc(DB.USER.cardName) + '</span></div>';
+    }).join('') + '</div>';
+
+    var foot =
+      '<div class="st__rule st__rule--foot"></div>' +
+      '<div class="st__foot">' +
+        '<div>' + esc(DB.BANK.address) + ' | ' + esc(DB.BANK.support) + '</div>' +
+        '<p>' + esc(DB.BANK.legalLine) + '</p>' +
+        '<span class="st__seal">' + icon('mark') + '</span>' +
+      '</div>';
 
     var bar = '<div class="docbar">' +
       '<button class="btn btn--ghost" data-action="send-doc" data-id="' + r.id + '">' + icon('share') + 'Email</button>' +
       '<button class="btn btn--primary" data-action="print">' + icon('print') + 'Print / PDF</button>' +
     '</div>';
 
-    return '<div class="doc">' + head + details + table + summary + catBlock + foot + '</div>' + bar;
+    return '<div class="st">' + head + summary + table + catBlock + holders + foot + '</div>' + bar;
   }
 
   /* ---------------------------------------------------------------- 13. Screen registry */

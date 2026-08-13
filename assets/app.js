@@ -100,7 +100,7 @@
   function toast(text, ms) {
     var el = document.createElement('div');
     el.className = 'toast';
-    el.innerHTML = '<span class="toast__mark">' + icon('mark', { w: 1.8 }) + '</span><span>' + esc(text) + '</span>';
+    el.innerHTML = '<span class="toast__mark">' + icon('markSolid') + '</span><span>' + esc(text) + '</span>';
     toastLayer.appendChild(el);
     setTimeout(function () {
       el.classList.add('toast--out');
@@ -133,10 +133,11 @@
   function plastic(acc, big) {
     var cls = 'plastic' + (acc.art === 'dark' ? ' plastic--dark' : acc.art === 'vault' ? ' plastic--vault' : '') + (big ? ' plastic--big' : '');
     return '<div class="' + cls + '">' +
-      '<div class="plastic__top">' + icon('mark', { w: 1.5 }) + '<span class="plastic__brand">Discovery</span></div>' +
+      '<div class="plastic__top">' + icon('mark') +
+        '<span class="plastic__brand"><b>Discovery</b><i>Bank</i></span></div>' +
       '<span class="plastic__wave">' + icon('wave', { w: 1.8 }) + '</span>' +
       '<div class="plastic__chip"></div>' +
-      (big ? '' : '<div class="plastic__mark">' + icon('mark', { w: 1.1 }) + '</div>') +
+      '<div class="plastic__mark">' + icon('mark') + '</div>' +
       (big && acc.pan ? '<div class="plastic__pan">' + esc(acc.pan) + '</div>' : '') +
       '<div class="plastic__foot">' +
         '<span class="plastic__tier">' + esc(acc.tier.toUpperCase()) + '</span>' +
@@ -520,7 +521,7 @@
       '<div class="group" style="margin-top:12px"><div class="group__head">All cards</div>' +
         DB.CARDS.map(function (c) {
           return row({
-            icon: 'cards', label: c.name, sub: c.kind + ' · ' + c.pan,
+            icon: 'cards', label: c.name, sub: c.kind + ' · ***' + c.last4,
             meta: '<span class="num">' + money(a.available) + '</span>',
             action: 'card', id: c.last4
           });
@@ -702,90 +703,126 @@
   }
 
   /* ---------------------------------------------------------------- 12. Statement document */
+  /* Бланк повторяет форму выписки Discovery: знак справа сверху, заголовок,
+     TAX INVOICE, адрес и параметры в две колонки, градиентная линейка,
+     account summary, transaction timeline, строка VAT, держатели карт и
+     подвал с реквизитами банка. */
+
+  /* В документе формат сумм свой: разряды через пробел, минус перед R */
+  function docAmt(v) {
+    var n = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (v < 0 ? '- ' : '') + 'R' + n.replace(/,/g, ' ');
+  }
+  function dPlain(dt) { return dt.getDate() + ' ' + MONTHS[dt.getMonth()] + ' ' + dt.getFullYear(); }
+
+  function docLogo() {
+    return '<div class="st__logo">' + icon('markSolid') +
+      '<span><b>Discovery</b><i>Bank</i></span></div>';
+  }
+
   function renderDoc(p) {
     var r = S.requests.filter(function (x) { return x.id === p.id; })[0];
     if (!r) return '<div class="empty"><p>Statement not found</p></div>';
-    var a = DB.account(r.accountId);
-    var list = DB.txFor(r.accountId, r.from, r.to);
-    var asc = list.slice().reverse();
-    var tot = DB.totals(list);
-    var open = DB.openingBalanceAt(r.accountId, r.from);
+
+    var a = DB.ACCOUNTS[0];
+    var asc = DB.txFor(null, r.from, r.to).slice().reverse();
+    var open = DB.openingBalanceAt(a.id, r.from);
     var close = asc.length ? asc[asc.length - 1].balanceAfter : open;
-    var cats = DB.byCategory(list);
-    var maxCat = cats.length ? cats[0].total : 1;
+    var vat = asc.reduce(function (sum, t) { return t.category === 'fees' ? sum - t.amount : sum; }, 0);
+    // номер выписки: помесячно, май 2026 — пятнадцатая
+    var stNo = (r.to.getFullYear() - 2025) * 12 + (r.to.getMonth() + 1) - 2;
 
     var head =
-      '<div class="doc__head">' +
-        '<div class="doc__brand">' + icon('mark', { w: 1.4 }) + '<b>' + DB.BANK.name + '</b></div>' +
-        '<div class="doc__kind"><b>Bank statement</b>' + esc(r.ref) + '<br>issued ' + dNum(r.created) + '</div>' +
-      '</div>';
+      docLogo() +
+      '<h1 class="st__h1">' + esc(a.name) + ' statement</h1>' +
+      '<div class="st__tax">TAX INVOICE</div>' +
+      '<div class="st__cols">' +
+        '<div class="st__addr">' + esc(DB.USER.formal) + '<br>' +
+          DB.USER.address.map(esc).join('<br>') + '</div>' +
+        '<div class="st__meta">' +
+          [['Statement number', String(stNo)],
+           ['Statement date', dPlain(r.to)],
+           ['Statement period', dPlain(r.from) + ' - ' + dPlain(r.to)],
+           ['Overdraft limit', 'R0.00'],
+           ['Minimum amount due', 'R0.00']].map(function (row) {
+            return '<div class="st__mrow"><span>' + esc(row[0]) + '</span>' +
+              '<b class="num">' + esc(row[1]) + '</b></div>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="st__rule"></div>';
 
-    var details = r.incl.details
-      ? '<div class="doc__grid">' +
-          '<div class="doc__block"><h4>Account holder</h4><p>' + DB.USER.first + ' ' + DB.USER.last + '<br>' +
-            DB.USER.address.map(esc).join('<br>') + '<br>Client no. ' + DB.USER.client + '</p></div>' +
-          '<div class="doc__block"><h4>Bank</h4><p>' + DB.BANK.legal + '<br>' + DB.BANK.address + '<br>' +
-            DB.BANK.reg + '</p></div>' +
-          '<div class="doc__block"><h4>Account</h4>' +
-            '<div class="doc__kv"><span>Name</span><b>' + esc(a.name) + '</b></div>' +
-            '<div class="doc__kv"><span>Number</span><b class="num">' + esc(a.number) + '</b></div>' +
-            '<div class="doc__kv"><span>Type</span><b>' + esc(a.type) + '</b></div>' +
-            '<div class="doc__kv"><span>Branch</span><b class="num">' + DB.BANK.branch + '</b></div>' +
-            '<div class="doc__kv"><span>SWIFT</span><b class="num">' + DB.BANK.swift + '</b></div>' +
-          '</div>' +
-          '<div class="doc__block"><h4>Period</h4>' +
-            '<div class="doc__kv"><span>From</span><b class="num">' + dNum(r.from) + '</b></div>' +
-            '<div class="doc__kv"><span>To</span><b class="num">' + dNum(r.to) + '</b></div>' +
-            '<div class="doc__kv"><span>Currency</span><b>' + DB.BANK.currency + '</b></div>' +
-            '<div class="doc__kv"><span>Transactions</span><b class="num">' + list.length + '</b></div>' +
-          '</div>' +
-        '</div>'
+    var summary = r.incl.details
+      ? '<div class="st__h2">Your account summary</div>' +
+        '<div class="st__srow"><span>Opening balance on</span><span class="num">' + dPlain(r.from) + '</span>' +
+          '<span class="num st__r">' + docAmt(open) + '</span></div>' +
+        '<div class="st__srow"><span>Closing balance on</span><span class="num">' + dPlain(r.to) + '</span>' +
+          '<span class="num st__r">' + docAmt(close) + '</span></div>' +
+        '<div class="st__acc"><b>' + esc(a.name) + '</b><b class="num">' + esc(a.number) + '</b></div>'
       : '';
+
+    var feeMark = '<span class="st__vatmark">' + icon('seal', { w: 2 }) + '</span>';
+
+    var rows = asc.map(function (t) {
+      return '<tr>' +
+        '<td class="num">' + dPlain(t.date) + '</td>' +
+        '<td class="num">' + (t.card ? '***' + esc(t.card) : '') + '</td>' +
+        '<td>' + esc(t.type) + '</td>' +
+        '<td>' + esc(t.merchant) +
+          (t.note && t.note.indexOf('Payslip') === 0
+            ? '<span class="st__note">' + esc(t.note.toLowerCase()) + '</span>' : '') + '</td>' +
+        '<td class="st__vatcell">' + (t.category === 'fees' ? feeMark : '') + '</td>' +
+        '<td class="r num">' + docAmt(t.amount) + '</td>' +
+      '</tr>';
+    }).join('');
 
     var table = r.incl.tx
-      ? '<div class="doc__sec">Transaction history</div>' +
-        '<table class="doc__table"><thead><tr>' +
-          '<th>Date</th><th>Description</th><th>Amount</th><th>Balance</th>' +
+      ? '<div class="st__h2 st__h2--tt">Transaction timeline</div>' +
+        '<div class="st__scroll"><table class="st__table"><thead><tr>' +
+          '<th>Date</th><th>Card no.</th><th>Type</th><th>Details</th><th></th><th class="r">Amount</th>' +
         '</tr></thead><tbody>' +
-        (asc.length ? asc.map(function (t) {
-          return '<tr><td class="num">' + dNum(t.date) + '</td>' +
-            '<td>' + esc(t.merchant) + '<br><span style="color:var(--ink-3)">' +
-              esc(t.type) + (t.card ? ' ***' + esc(t.card) : '') + ' · ' + esc(cat(t.category).label) + ' · ' + esc(t.ref) + '</span></td>' +
-            '<td class="r num">' + amountSigned(t.amount) + '</td>' +
-            '<td class="r num">' + amountSigned(t.balanceAfter) + '</td></tr>';
-        }).join('') : '<tr><td colspan="4" style="padding:16px 22px;color:var(--ink-3)">No transactions for this period</td></tr>') +
-        '</tbody></table>'
+          '<tr class="st__bold"><td></td><td></td><td></td><td>Opening balance</td><td></td>' +
+            '<td class="r num">' + docAmt(open) + '</td></tr>' +
+          rows +
+          '<tr class="st__bold"><td></td><td></td><td></td><td>Closing balance</td><td></td>' +
+            '<td class="r num">' + docAmt(close) + '</td></tr>' +
+          '<tr class="st__vat"><td>Total VAT</td><td class="num">' +
+            vat.toFixed(2) + '</td><td colspan="4">' + feeMark +
+            '<span class="st__vatlbl">= fees charged (VAT incl.)</span></td></tr>' +
+        '</tbody></table></div>'
       : '';
 
-    var summary =
-      '<div class="doc__tot">' +
-        '<div class="doc__kv"><span>Opening balance</span><b class="num">' + amountSigned(open) + '</b></div>' +
-        '<div class="doc__kv"><span>Money in</span><b class="num">' + amount(tot.in) + '</b></div>' +
-        '<div class="doc__kv"><span>Money out</span><b class="num">' + amountSigned(-tot.out) + '</b></div>' +
-        '<div class="doc__kv"><span>Bank fees</span><b class="num">' + amount(tot.fees) + '</b></div>' +
-        '<div class="doc__kv" style="border-top:1px solid var(--line-2);margin-top:6px;padding-top:6px">' +
-          '<span>Closing balance</span><b class="num">' + amountSigned(close) + '</b></div>' +
-      '</div>';
-
+    var cats = DB.byCategory(asc);
+    var maxCat = cats.length ? cats[0].total : 1;
     var catBlock = r.incl.cats && cats.length
-      ? '<div class="doc__sec">Debits by category</div>' +
+      ? '<div class="st__h2 st__h2--tt">Debits by category</div>' +
         '<div class="bars">' + cats.slice(0, 7).map(function (c) {
           return '<div><div class="bar__top"><span>' + esc(cat(c.category).label) + '</span>' +
-            '<span class="num">' + amount(c.total) + '</span></div>' +
-            '<div class="bar__track"><div class="bar__fill" style="width:' + Math.round(c.total / maxCat * 100) + '%"></div></div></div>';
+            '<span class="num">' + docAmt(c.total) + '</span></div>' +
+            '<div class="bar__track"><div class="bar__fill" style="width:' +
+              Math.round(c.total / maxCat * 100) + '%"></div></div></div>';
         }).join('') + '</div>'
       : '';
 
-    var foot = '<div class="doc__foot">This statement was generated automatically on ' + dLong(r.created) +
-      ' and is valid without a signature. ' + DB.BANK.legal + ', ' + DB.BANK.reg +
-      '. Queries: ' + DB.BANK.support + '. This is a design mockup — all data is fictional.</div>';
+    var holders = '<div class="st__holders">' + DB.CARDS.map(function (c) {
+      return '<div class="st__hrow"><span class="num">***' + esc(c.last4) + '</span>' +
+        '<span>' + esc(DB.USER.cardName) + '</span></div>';
+    }).join('') + '</div>';
+
+    var foot =
+      '<div class="st__rule st__rule--foot"></div>' +
+      '<div class="st__foot">' +
+        '<div>' + esc(DB.BANK.address) + ' | ' + esc(DB.BANK.support) + '</div>' +
+        '<p>' + esc(DB.BANK.legalLine) + '</p>' +
+        '<span class="st__seal">' + icon('mark') + '</span>' +
+      '</div>';
 
     var bar = '<div class="docbar">' +
       '<button class="btn btn--ghost" data-action="send-doc" data-id="' + r.id + '">' + icon('share') + 'Email</button>' +
       '<button class="btn btn--primary" data-action="print">' + icon('print') + 'Print / PDF</button>' +
     '</div>';
 
-    return '<div class="doc">' + head + details + table + summary + catBlock + foot + '</div>' + bar;
+    return '<div class="st">' + head + summary + table + catBlock + holders + foot + '</div>' + bar;
   }
 
   /* ---------------------------------------------------------------- 13. Screen registry */

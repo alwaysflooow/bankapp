@@ -58,14 +58,32 @@
     wave:      '<path d="M6 8.4a6 6 0 0 1 0 7.2M9.6 6.2a10 10 0 0 1 0 11.6M13.2 4.4a13.6 13.6 0 0 1 0 15.2"/>'
   };
 
-  /* Фирменный знак — двойной шеврон Discovery.
-     Это приближение по форме: перед сдачей замените путь на официальный SVG
-     из брендбука (см. README, раздел «Как поменять бренд»). */
-  var MARK = '<path d="M4.6 6.8 12 14.1l7.4-7.3"/><path d="M4.6 12.4 12 19.7l7.4-7.3"/>';
+  /* Фирменный знак: кольцо, ромб и шеврон под ним — нарисован по образцам
+     из брендбука. Заливка сплошная, поэтому пути несут собственные
+     fill/stroke и не подчиняются обводке обёртки. */
+  var MARK =
+    '<circle cx="12" cy="12" r="9.6" fill="none" stroke="currentColor" stroke-width="2.4"/>' +
+    '<path fill="currentColor" stroke="none" d="M12 5.9 14.05 7.95 12 10 9.95 7.95Z"/>' +
+    '<path fill="currentColor" stroke="none" d="M4.5 9.8 12 17.3 19.5 9.8 16.6 6.9 12 11.5 7.4 6.9Z"/>';
+
+  /* Плашечная версия: залитый круг, знак вырезан белым — так знак стоит
+     в шапке выписки и в тостах */
+  var MARK_SOLID =
+    '<circle cx="12" cy="12" r="11" fill="currentColor" stroke="none"/>' +
+    '<path fill="#fff" stroke="none" d="M12 5.6 14.15 7.75 12 9.9 9.85 7.75Z"/>' +
+    '<path fill="#fff" stroke="none" d="M4.2 9.6 12 17.4 19.8 9.6 16.8 6.6 12 11.4 7.2 6.6Z"/>';
+
+  /* Развёрнутая версия для иконки приложения: ромб и два шеврона без кольца */
+  var MARK_FULL =
+    '<path fill="currentColor" stroke="none" d="M12 3.5 14.1 5.6 12 7.7 9.9 5.6Z"/>' +
+    '<path fill="currentColor" stroke="none" d="M6.5 8.1 12 13.6 17.5 8.1 15.2 5.8 12 9 8.8 5.8Z"/>' +
+    '<path fill="currentColor" stroke="none" d="M3.4 12.6 12 21.2 20.6 12.6 18.3 10.3 12 16.6 5.7 10.3Z"/>';
 
   function icon(name, opts) {
     opts = opts || {};
-    var body = name === 'mark' ? MARK : P[name];
+    var body = name === 'mark' ? MARK
+      : name === 'markSolid' ? MARK_SOLID
+      : name === 'markFull' ? MARK_FULL : P[name];
     if (!body) return '';
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' +
       (opts.w || 1.6) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +

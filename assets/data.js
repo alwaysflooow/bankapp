@@ -27,7 +27,11 @@
     reg: 'Reg. 2015/408745/06 · FSP 48657 · NCRCP 9997',
     branch: '679000',
     swift: 'DISCZAJJ',
-    address: '1 Discovery Place, Sandton, 2196',
+    address: '1 Discovery Place, Sandhurst, Sandton, PO Box 786722, Sandton, 2196',
+    legalLine: 'Discovery Bank Limited. Registration number 2015/408745/06. ' +
+               'An authorised financial services and registered credit provider. ' +
+               'FSP number 48657. NCR registration number NCRCP9997. ' +
+               'VAT registration number 4590272730. Limits, terms and conditions apply.',
     support: '0800 07 96 97',
     currency: 'ZAR',
     symbol: 'R'
@@ -43,7 +47,9 @@
     emailMasked: 'c•••••.p••••@example.co.za',
     phoneMasked: '+27 •• ••• 2832',
     idMasked: '9207•••••08 2',
-    address: ['24 Rietfontein Road', 'Boksburg', 'Gauteng, 1459'],
+    formal: 'Ms C Puren',
+    cardName: 'Ms Charne Puren',
+    address: ['34 Athens Road', 'Cape Cove Unit 2', 'Waves Edge', 'Cape Town', '7441'],
     client: '4471 0298',
     since: 'June 2021',
     tier: 'Gold'
