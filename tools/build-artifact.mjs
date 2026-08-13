@@ -1,4 +1,4 @@
-/* Собирает макет в один самодостаточный HTML-файл (dist/meridian-bank.html).
+/* Собирает макет в один самодостаточный HTML-файл (dist/discovery-bank.html).
    Нужен для публикации артефакта и для отправки макета одним файлом:
    внешние запросы там запрещены, поэтому CSS и JS инлайнятся.
 
@@ -18,12 +18,12 @@ const css = read('assets/styles.css');
 const js = ['assets/icons.js', 'assets/data.js', 'assets/app.js'].map(read).join('\n');
 
 const out =
-  '<title>Meridian Bank</title>\n' +
+  '<title>Discovery Bank</title>\n' +
   '<style>\n' + css + '\n</style>\n' +
   body.replace(/\s*<script src="[^"]+"><\/script>/g, '').trim() + '\n' +
   '<script>\n' + js + '\n</script>\n';
 
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
-fs.writeFileSync(path.join(root, 'dist/meridian-bank.html'), out);
+fs.writeFileSync(path.join(root, 'dist/discovery-bank.html'), out);
 
-console.log('dist/meridian-bank.html — ' + (out.length / 1024).toFixed(1) + ' KB');
+console.log('dist/discovery-bank.html — ' + (out.length / 1024).toFixed(1) + ' KB');

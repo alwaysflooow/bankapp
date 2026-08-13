@@ -1,5 +1,5 @@
 /* =========================================================================
-   Meridian Bank — макет мобильного банка
+   Discovery Bank — макет мобильного банка
    Дизайн-механика снята со скринов Discovery Bank: градиентная линейка под
    шапкой, маджента + тёмно-синий как два носителя цвета, белые поверхности
    с многослойной мягкой тенью, hairline-разделители с отступом под иконку.
@@ -32,7 +32,7 @@
      обычными чернилами, поэтому отдельной «зелёной» краски нет */
   --debit:        #D5203C;
 
-  /* сцена «Momentum Money» */
+  /* сцена «Vitality Money» */
   --bronze-1: #A9603A;
   --bronze-2: #C4804F;
   --bronze-3: #AA6539;
@@ -153,11 +153,17 @@ h1,h2,h3,p{ margin:0; }
 }
 
 /* ---------- 5. Статус-бар ------------------------------------------------ */
-.statusbar{
-  flex:0 0 auto;
-  height:34px; padding:0 18px 0 20px;
-  display:flex; align-items:center; justify-content:space-between;
-  color:var(--ink);
+/* Статус-бар — часть десктопной рамки телефона. На самом телефоне он не
+   рисуется: там уже есть системный, и второй ряд времени/сети/батареи
+   выглядел бы дублем. */
+.statusbar{ display:none; }
+@media (min-width:560px){
+  .statusbar{
+    flex:0 0 auto;
+    height:34px; padding:0 18px 0 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    color:var(--ink);
+  }
 }
 .statusbar__time{ font-size:13px; font-weight:600; letter-spacing:.2px; }
 .statusbar__icons{ display:flex; align-items:center; gap:6px; }
@@ -476,7 +482,7 @@ h1,h2,h3,p{ margin:0; }
 .plastic__net{ font-size:11px; font-weight:700; letter-spacing:-.3px; font-style:italic; }
 .plastic__tier{ font-size:6.5px; font-weight:600; letter-spacing:.3px; }
 
-/* ---------- 17. Панель Momentum Money ----------------------------------- */
+/* ---------- 17. Панель Vitality Money ----------------------------------- */
 .momentum{
   margin:6px 14px 18px; padding:16px 14px 14px;
   border-radius:var(--r-lg);
@@ -830,7 +836,13 @@ h1,h2,h3,p{ margin:0; }
   .screen{ position:static; overflow:visible; }
 }
 
-/* ---------- 26. Уважение к настройкам ------------------------------------ */
+/* ---------- 26. Установленное приложение --------------------------------- */
+/* правило идёт последним, чтобы перебить десктопную рамку на планшетах */
+@media (display-mode:standalone), (display-mode:fullscreen){
+  .statusbar{ display:none; }
+}
+
+/* ---------- 27. Уважение к настройкам ------------------------------------ */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{
     animation-duration:.001ms !important;

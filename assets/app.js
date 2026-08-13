@@ -1,5 +1,5 @@
 /* =========================================================================
-   Meridian Bank — mockup logic.
+   Discovery Bank — mockup logic.
    String templates for rendering, one delegated click handler, screen
    transitions via cloned .screen nodes. No dependencies.
    ========================================================================= */
@@ -11,7 +11,7 @@
   var viewport = $('#viewport'), appbarEl = $('#appbar'), tabbarEl = $('#tabbar'),
       sheetLayer = $('#sheetLayer'), sheetEl = $('#sheet'), toastLayer = $('#toastLayer');
 
-  var STORE_KEY = 'meridian-mock-v1';
+  var STORE_KEY = 'discovery-mock-v1';
 
   /* ---------------------------------------------------------------- 1. State */
   var S = {
@@ -21,7 +21,7 @@
     authed: false,
     hide: false,
     frozen: false,
-    tx: { q: '', month: 'all', account: 'all' },
+    tx: { q: '', month: 'all', card: 'all' },
     order: null,
     requests: []
   };
@@ -133,7 +133,7 @@
   function plastic(acc, big) {
     var cls = 'plastic' + (acc.art === 'dark' ? ' plastic--dark' : acc.art === 'vault' ? ' plastic--vault' : '') + (big ? ' plastic--big' : '');
     return '<div class="' + cls + '">' +
-      '<div class="plastic__top">' + icon('mark', { w: 1.5 }) + '<span class="plastic__brand">Meridian</span></div>' +
+      '<div class="plastic__top">' + icon('mark', { w: 1.5 }) + '<span class="plastic__brand">Discovery</span></div>' +
       '<span class="plastic__wave">' + icon('wave', { w: 1.8 }) + '</span>' +
       '<div class="plastic__chip"></div>' +
       (big ? '' : '<div class="plastic__mark">' + icon('mark', { w: 1.1 }) + '</div>') +
@@ -147,11 +147,15 @@
   /* Мета-блок строки операции: тип, счета, категория — каждая строка отдельно,
      как в приложении-референсе. У расхода сначала «To:», у прихода — «From:». */
   function txMeta(t) {
-    var lines = [t.channel];
-    if (t.from && t.to) {
-      lines = lines.concat(t.amount < 0 ? ['To: ' + t.to, 'From: ' + t.from] : ['From: ' + t.from, 'To: ' + t.to]);
-    } else if (t.from || t.to) {
-      lines.push(t.from || t.to);
+    var acc = DB.ACCOUNTS[0].number;
+    var lines = [t.type];
+    var counter = t.from === acc ? t.to : t.from;
+    if (counter && counter !== acc) {
+      lines = lines.concat(t.amount < 0
+        ? ['To: ' + counter, 'From: ' + acc]
+        : ['From: ' + counter, 'To: ' + acc]);
+    } else {
+      lines.push(acc);
     }
     lines.push(cat(t.category).label);
     return lines.map(function (l) { return '<span class="tx__meta">' + esc(l) + '</span>'; }).join('');
@@ -209,7 +213,6 @@
         '<button class="field__link" data-action="forgot">Forgot password?</button>' +
       '</div>' +
       '<div class="login__spacer"></div>' +
-      '<div class="login__hint">Demo access: <b>thandi</b> / <b>demo1234</b>. All data is fictional and no payments are processed.</div>' +
       '<div class="btnrow">' +
         '<button class="btn btn--ghost" data-action="login-clear">Cancel</button>' +
         '<button class="btn btn--primary" data-action="login">Log in</button>' +
@@ -220,9 +223,11 @@
   function doLogin() {
     var u = $('#f-user'), p = $('#f-pass');
     if (!u.value.trim() || !p.value) { toast('Please enter your credentials to log in'); return; }
-    if (u.value.trim().toLowerCase() !== DB.USER.username || p.value !== DB.USER.password) {
-      toast('Incorrect username or password'); return;
-    }
+    // номер телефона сверяем по цифрам: +27 66 258 2832 и 0662582832 равнозначны
+    var typed = u.value.replace(/[\s()-]/g, '');
+    var expect = DB.USER.username;
+    var ok = typed === expect || typed === expect.replace(/^\+27/, '0');
+    if (!ok || p.value !== DB.USER.password) { toast('Incorrect username or password'); return; }
     S.authed = true;
     S.stack = [];
     save();
@@ -267,7 +272,7 @@
       '<span class="acard__art">' + plastic(DB.ACCOUNTS[0]) + '</span>' +
       '<span class="acard__body">' +
         '<span class="acard__name">Bank Portfolio</span>' +
-        '<span class="acard__type">' + DB.ACCOUNTS.length + ' accounts</span>' +
+        '<span class="acard__type">' + DB.ACCOUNTS.length + (DB.ACCOUNTS.length === 1 ? ' account' : ' accounts') + '</span>' +
         '<span class="acard__amt num">' + money(total) + '</span>' +
         '<span class="acard__lbl">Total balance</span>' +
         '<span class="acard__amt acard__amt--2 num">' + money(avail) + '</span>' +
@@ -278,8 +283,8 @@
       return '<button class="acard" data-action="account" data-id="' + a.id + '">' +
         '<span class="acard__art">' + plastic(a) + '</span>' +
         '<span class="acard__body">' +
-          '<span class="acard__name">' + esc(a.name) + '</span>' +
-          '<span class="acard__type">' + esc(a.type) + ' · ' + esc(a.last4) + '</span>' +
+          '<span class="acard__name">' + esc(a.shortName || a.name) + '</span>' +
+          '<span class="acard__type">' + esc(a.number) + '</span>' +
           '<span class="acard__amt num">' + moneySigned(a.balance) + '</span>' +
           '<span class="acard__lbl">' + (a.kind === 'credit' ? 'Outstanding balance' : 'Total balance') + '</span>' +
           '<span class="acard__amt acard__amt--2 num">' + money(a.available) + '</span>' +
@@ -315,7 +320,7 @@
 
       '<div class="momentum">' +
         '<div class="momentum__head">' +
-          '<span class="momentum__title">Momentum Money</span>' +
+          '<span class="momentum__title">Vitality Money</span>' +
           '<button class="momentum__status" data-action="momentum">Bronze Status' + icon('chevron', { w: 2 }) + '</button>' +
         '</div>' +
         '<div class="panel"><div class="panel__title">Financial Behaviours</div>' +
@@ -351,7 +356,7 @@
     var rows = DB.ACCOUNTS.map(function (a) {
       return '<button class="row" data-action="account" data-id="' + a.id + '">' +
         '<span class="row__ic">' + icon(a.kind === 'credit' ? 'cards' : a.kind === 'savings' ? 'piggy' : 'bank') + '</span>' +
-        '<span class="row__body"><span class="row__label">' + esc(a.name) + '</span>' +
+        '<span class="row__body"><span class="row__label">' + esc(a.shortName || a.name) + '</span>' +
           '<span class="row__sub">' + esc(a.type) + ' · ' + esc(a.number) + '</span></span>' +
         '<span class="row__meta"><span class="num">' + moneySigned(a.balance) + '</span>' +
           '<span class="row__sub num">' + money(a.available) + ' available</span></span>' +
@@ -420,12 +425,14 @@
       from = monthStart(+parts[0], +parts[1]);
       to = monthEnd(+parts[0], +parts[1]);
     }
-    var list = DB.txFor(S.tx.account, from, to);
+    var list = DB.txFor(null, from, to);
+    if (S.tx.card !== 'all') list = list.filter(function (t) { return t.card === S.tx.card; });
     var q = S.tx.q.trim().toLowerCase();
     if (q) {
       list = list.filter(function (t) {
         return t.merchant.toLowerCase().indexOf(q) !== -1 ||
                cat(t.category).label.toLowerCase().indexOf(q) !== -1 ||
+               t.type.toLowerCase().indexOf(q) !== -1 ||
                t.ref.toLowerCase().indexOf(q) !== -1;
       });
     }
@@ -442,10 +449,10 @@
           MONTHS[m.month] + '</button>';
       }).join('');
 
-    var accChips = '<button class="chip' + (S.tx.account === 'all' ? ' chip--on' : '') + '" data-action="a" data-id="all">All accounts</button>' +
-      DB.ACCOUNTS.map(function (a) {
-        return '<button class="chip' + (S.tx.account === a.id ? ' chip--on' : '') + '" data-action="a" data-id="' + a.id + '">' +
-          esc(a.name) + '</button>';
+    var accChips = '<button class="chip' + (S.tx.card === 'all' ? ' chip--on' : '') + '" data-action="a" data-id="all">All cards</button>' +
+      DB.CARDS.map(function (c) {
+        return '<button class="chip' + (S.tx.card === c.last4 ? ' chip--on' : '') + '" data-action="a" data-id="' + c.last4 + '">' +
+          '***' + c.last4 + '</button>';
       }).join('');
 
     return '<div class="searchbar"><div class="search">' + icon('search') +
@@ -470,16 +477,17 @@
     if (!t) return;
     var a = DB.account(t.accountId), c = cat(t.category);
     var rows = [
-      ['Account', a.name + ' · ' + a.last4],
+      ['Account', a.number],
       ['Category', c.label],
       ['Date', dLong(t.date) + ', ' + tTime(t.date)],
-      ['Channel', t.channel],
+      ['Type', t.type],
       ['Reference', t.ref],
       ['Balance after', amountSigned(t.balanceAfter)]
     ];
-    if (t.from) rows.splice(2, 0, ['From', t.from]);
-    if (t.to) rows.splice(t.from ? 3 : 2, 0, ['To', t.to]);
-    if (t.note) rows.splice(2, 0, ['Description', t.note]);
+    if (t.card) rows.splice(1, 0, ['Card', '***' + t.card]);
+    if (t.from) rows.splice(3, 0, ['From', t.from]);
+    if (t.to) rows.splice(t.from ? 4 : 3, 0, ['To', t.to]);
+    if (t.note) rows.splice(3, 0, ['Description', t.note]);
 
     openSheet(null,
       '<div style="display:flex;align-items:flex-start;gap:13px;margin-bottom:14px">' +
@@ -500,11 +508,11 @@
 
   /* ---------------------------------------------------------------- 9. Screen: cards */
   function renderCards() {
-    var a = DB.account('ac-everyday'), c = DB.account('ac-credit');
+    var a = DB.ACCOUNTS[0];
     return '<div class="cards-hero">' + plastic(a, true) +
         '<div style="text-align:center">' +
-          '<div class="t-section">' + esc(a.name) + '</div>' +
-          '<div class="t-cap">' + esc(a.pan) + ' · ' + (S.frozen ? 'Frozen' : 'Active') + '</div>' +
+          '<div class="t-section">' + esc(DB.CARDS[0].name) + '</div>' +
+          '<div class="t-cap">' + esc(DB.CARDS[0].pan) + ' · ' + (S.frozen ? 'Frozen' : 'Active') + '</div>' +
         '</div></div>' +
       '<div class="actions">' +
         '<button class="action" data-action="freeze"><span class="action__ic">' + icon('lock') + '</span><span>' + (S.frozen ? 'Unfreeze' : 'Freeze') + '</span></button>' +
@@ -513,8 +521,13 @@
         '<button class="action" data-action="soon"><span class="action__ic">' + icon('bell') + '</span><span>Alerts</span></button>' +
       '</div>' +
       '<div class="group" style="margin-top:12px"><div class="group__head">All cards</div>' +
-        row({ icon: 'cards', label: a.name, sub: 'Debit · ' + a.last4, meta: '<span class="num">' + money(a.available) + '</span>', action: 'account', id: a.id }) +
-        row({ icon: 'cards', label: c.name, sub: 'Credit · ' + c.last4, meta: '<span class="num">' + money(c.available) + '</span>', action: 'account', id: c.id }) +
+        DB.CARDS.map(function (c) {
+          return row({
+            icon: 'cards', label: c.name, sub: c.kind + ' · ' + c.pan,
+            meta: '<span class="num">' + money(a.available) + '</span>',
+            action: 'card', id: c.last4
+          });
+        }).join('') +
       '</div>' +
       '<div class="group"><div class="group__head">Security</div>' +
         row({ icon: 'lock', label: 'Change PIN', action: 'soon' }) +
@@ -529,10 +542,10 @@
         row({ icon: 'travel', label: 'Travel', action: 'soon' }) +
         row({ icon: 'payshap', label: 'PayShap', action: 'soon' }) +
       '</div>' +
-      '<div class="group"><div class="group__head">Meridian Pay</div>' +
+      '<div class="group"><div class="group__head">Discovery Pay</div>' +
         row({ icon: 'seal', label: 'Contact Payments', action: 'soon' }) +
         row({ icon: 'heart', label: 'Health Pay', action: 'soon' }) +
-        row({ icon: 'tick', label: 'Momentum Pay', action: 'soon' }) +
+        row({ icon: 'tick', label: 'Vitality Pay', action: 'soon' }) +
       '</div>' +
       '<div class="group"><div class="group__head">Document repository</div>' +
         row({ icon: 'doc', label: 'Statements', sub: 'Order and request history', action: 'statements' }) +
@@ -740,7 +753,7 @@
         (asc.length ? asc.map(function (t) {
           return '<tr><td class="num">' + dNum(t.date) + '</td>' +
             '<td>' + esc(t.merchant) + '<br><span style="color:var(--ink-3)">' +
-              esc(cat(t.category).label) + ' · ' + esc(t.channel) + ' · ' + esc(t.ref) + '</span></td>' +
+              esc(t.type) + (t.card ? ' ***' + esc(t.card) : '') + ' · ' + esc(cat(t.category).label) + ' · ' + esc(t.ref) + '</span></td>' +
             '<td class="r num">' + amountSigned(t.amount) + '</td>' +
             '<td class="r num">' + amountSigned(t.balanceAfter) + '</td></tr>';
         }).join('') : '<tr><td colspan="4" style="padding:16px 22px;color:var(--ink-3)">No transactions for this period</td></tr>') +
@@ -783,7 +796,7 @@
     login:      { chrome: false, title: 'Log in', render: renderLogin, flush: true },
     home:       { tab: 'home', appbar: homeAppbar, render: renderHome },
     accounts:   { tab: 'accounts', title: 'Accounts', render: renderAccounts },
-    account:    { tab: 'accounts', title: function (p) { var a = DB.account(p.id); return a ? a.name : 'Account'; }, back: true, render: renderAccount },
+    account:    { tab: 'accounts', title: function (p) { var a = DB.account(p.id); return a ? (a.shortName || a.name) : 'Account'; }, back: true, render: renderAccount },
     transact:   { tab: 'transact', title: 'Transaction history', render: renderTransact },
     cards:      { tab: 'cards', title: 'Cards', render: renderCards },
     more:       { tab: 'more', title: 'More', render: renderMore, flush: true },
@@ -969,7 +982,6 @@
     },
     'order-current': function () {
       S.order = defaultOrder();
-      if (S.tx.account !== 'all') S.order.accountId = S.tx.account;
       if (S.tx.month !== 'all') {
         var p = S.tx.month.split('-');
         S.order.period = 'custom';
@@ -978,8 +990,8 @@
       }
       go('order', {}, 'push');
     },
-    'history-for': function (el) {
-      S.tx.account = el.dataset.id;
+    'history-for': function () {
+      S.tx.card = 'all';
       S.tx.month = 'all';
       S.tx.q = '';
       go('transact', {}, 'fade');
@@ -1032,19 +1044,34 @@
         '<button class="btn btn--primary btn--wide" style="margin-top:16px" data-action="copy">Copy details</button>');
     },
     copy: function () { closeSheet(); toast('Account details copied'); },
+    card: function (el) {
+      var c = DB.CARDS.filter(function (x) { return x.last4 === el.dataset.id; })[0];
+      if (!c) return;
+      var used = DB.TX.filter(function (t) { return t.card === c.last4; });
+      openSheet(c.name,
+        '<div class="kvlist" style="padding:0">' +
+        [['Card number', c.pan],
+         ['Card type', c.kind],
+         ['Linked account', DB.ACCOUNTS[0].number],
+         ['Status', S.frozen ? 'Frozen' : 'Active'],
+         ['Transactions', String(used.length)]].map(function (r) {
+          return '<div class="kv"><span class="kv__k">' + r[0] + '</span><span class="kv__v num">' + esc(r[1]) + '</span></div>';
+        }).join('') + '</div>' +
+        '<button class="btn btn--ghost btn--wide" style="margin-top:16px" data-action="soon">Card settings</button>');
+    },
 
     /* — history — */
     tx: function (el) { openTx(el.dataset.id); },
     proof: function () { closeSheet(); toast('Proof of payment sent by email'); },
     m: function (el) { S.tx.month = el.dataset.id; repaint(); },
-    a: function (el) { S.tx.account = el.dataset.id; repaint(); },
+    a: function (el) { S.tx.card = el.dataset.id; repaint(); },
     'filter-sheet': function () {
       openSheet('Filters',
-        '<p class="t-cap" style="margin-bottom:12px">Clear the month, account and search term.</p>' +
+        '<p class="t-cap" style="margin-bottom:12px">Clear the month, card and search term.</p>' +
         '<button class="btn btn--ghost btn--wide" data-action="filter-reset">Reset filters</button>');
     },
     'filter-reset': function () {
-      S.tx = { q: '', month: 'all', account: 'all' };
+      S.tx = { q: '', month: 'all', card: 'all' };
       closeSheet();
       repaint();
       toast('Filters cleared');

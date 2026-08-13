@@ -1,7 +1,7 @@
-<title>Meridian Bank</title>
+<title>Discovery Bank</title>
 <style>
 /* =========================================================================
-   Meridian Bank — макет мобильного банка
+   Discovery Bank — макет мобильного банка
    Дизайн-механика снята со скринов Discovery Bank: градиентная линейка под
    шапкой, маджента + тёмно-синий как два носителя цвета, белые поверхности
    с многослойной мягкой тенью, hairline-разделители с отступом под иконку.
@@ -34,7 +34,7 @@
      обычными чернилами, поэтому отдельной «зелёной» краски нет */
   --debit:        #D5203C;
 
-  /* сцена «Momentum Money» */
+  /* сцена «Vitality Money» */
   --bronze-1: #A9603A;
   --bronze-2: #C4804F;
   --bronze-3: #AA6539;
@@ -155,11 +155,17 @@ h1,h2,h3,p{ margin:0; }
 }
 
 /* ---------- 5. Статус-бар ------------------------------------------------ */
-.statusbar{
-  flex:0 0 auto;
-  height:34px; padding:0 18px 0 20px;
-  display:flex; align-items:center; justify-content:space-between;
-  color:var(--ink);
+/* Статус-бар — часть десктопной рамки телефона. На самом телефоне он не
+   рисуется: там уже есть системный, и второй ряд времени/сети/батареи
+   выглядел бы дублем. */
+.statusbar{ display:none; }
+@media (min-width:560px){
+  .statusbar{
+    flex:0 0 auto;
+    height:34px; padding:0 18px 0 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    color:var(--ink);
+  }
 }
 .statusbar__time{ font-size:13px; font-weight:600; letter-spacing:.2px; }
 .statusbar__icons{ display:flex; align-items:center; gap:6px; }
@@ -478,7 +484,7 @@ h1,h2,h3,p{ margin:0; }
 .plastic__net{ font-size:11px; font-weight:700; letter-spacing:-.3px; font-style:italic; }
 .plastic__tier{ font-size:6.5px; font-weight:600; letter-spacing:.3px; }
 
-/* ---------- 17. Панель Momentum Money ----------------------------------- */
+/* ---------- 17. Панель Vitality Money ----------------------------------- */
 .momentum{
   margin:6px 14px 18px; padding:16px 14px 14px;
   border-radius:var(--r-lg);
@@ -832,7 +838,13 @@ h1,h2,h3,p{ margin:0; }
   .screen{ position:static; overflow:visible; }
 }
 
-/* ---------- 26. Уважение к настройкам ------------------------------------ */
+/* ---------- 26. Установленное приложение --------------------------------- */
+/* правило идёт последним, чтобы перебить десктопную рамку на планшетах */
+@media (display-mode:standalone), (display-mode:fullscreen){
+  .statusbar{ display:none; }
+}
+
+/* ---------- 27. Уважение к настройкам ------------------------------------ */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{
     animation-duration:.001ms !important;
@@ -872,9 +884,6 @@ h1,h2,h3,p{ margin:0; }
     </div>
   </div>
 
-  <p class="stage__hint">
-    Demo access — username <b>thandi</b>, password <b>demo1234</b>
-  </p>
 </div>
 <script>
 /* Иконки — единая сетка 24, штрих 1.6, цвет наследуется (currentColor).
@@ -930,15 +939,17 @@ h1,h2,h3,p{ margin:0; }
     bolt:      '<path d="M13.2 3.4 5.6 13.4h5l-1.2 7.2 7.8-10.2h-5.2z"/>',
     phone:     '<rect x="6.6" y="2.8" width="10.8" height="18.4" rx="2.6"/><path d="M10.6 18.6h2.8"/>',
     salary:    '<rect x="3.4" y="6.4" width="17.2" height="11.2" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6.4 9.6v4.8M17.6 9.6v4.8"/>',
-    piggy:     '<path d="M20.4 12.2c0 1.7-.9 3.2-2.4 4.2v2.4h-2.8l-.5-1.3H9.9l-.5 1.3H6.6v-2.5c-1.5-1-2.4-2.5-2.4-4.1 0-3.1 3.2-5.6 7.2-5.6h1.2c4 0 7.8 2.5 7.8 5.6Z"/><path d="M4.4 10.9H3.2a1.5 1.5 0 0 1 1.7-1.4"/><path d="M16.5 11.5h.01"/><path d="M10.4 6.7c-.6-1-.3-2.3.6-2.9"/>',
+    piggy:     '<path d="M6.6 9.4h10.8l1.1 10.2H5.5z"/><path d="M8.6 9.4V6.4a1.2 1.2 0 0 1 1.2-1.2h4.4a1.2 1.2 0 0 1 1.2 1.2v3"/><path d="M12 12.4v4.2M9.9 14.5h4.2"/>',
     swap:      '<path d="M6.4 8.4h12l-3-3M17.6 15.6h-12l3 3"/>',
     receipt:   '<path d="M6 3.4h12v17.2l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z"/><path d="M9 8.4h6M9 12h6M9 15.4h3.6"/>',
     globe:     '<circle cx="12" cy="12" r="8.4"/><path d="M3.8 12h16.4"/><path d="M12 3.6c2.2 2.3 3.3 5.2 3.3 8.4S14.2 18.1 12 20.4c-2.2-2.3-3.3-5.2-3.3-8.4S9.8 5.9 12 3.6Z"/>',
     wave:      '<path d="M6 8.4a6 6 0 0 1 0 7.2M9.6 6.2a10 10 0 0 1 0 11.6M13.2 4.4a13.6 13.6 0 0 1 0 15.2"/>'
   };
 
-  /* Фирменный знак — меридианы на круге (нейтральная марка макета) */
-  var MARK = '<circle cx="12" cy="12" r="8.6"/><path d="M12 3.4c2.4 2.4 3.6 5.4 3.6 8.6S14.4 18.2 12 20.6c-2.4-2.4-3.6-5.4-3.6-8.6S9.6 5.8 12 3.4Z"/><path d="M3.6 9.6h16.8M3.6 14.4h16.8"/>';
+  /* Фирменный знак — двойной шеврон Discovery.
+     Это приближение по форме: перед сдачей замените путь на официальный SVG
+     из брендбука (см. README, раздел «Как поменять бренд»). */
+  var MARK = '<path d="M4.6 6.8 12 14.1l7.4-7.3"/><path d="M4.6 12.4 12 19.7l7.4-7.3"/>';
 
   function icon(name, opts) {
     opts = opts || {};
@@ -953,309 +964,373 @@ h1,h2,h3,p{ margin:0; }
 })(window);
 
 /* =========================================================================
-   Mockup data. Everything is deterministic: the same seed produces the same
-   history on every load, and account balances are NOT hand-written — they are
-   derived from the postings, so a statement reconciles with the dashboard.
+   Mockup data.
+
+   Постоянная часть (15 апреля — 28 июля) перенесена из присланной выписки
+   один в один. Периоды до 15 апреля и август сгенерированы детерминированно
+   в той же логике: те же торговые точки, те же типы проводок, тот же ритм
+   зарплатных SWIFT-поступлений раз в две недели.
+
+   Баланс нигде не задан руками: он считается из проводок от opening balance
+   на 17 марта. Два «подгоночных» перевода в накопления выводятся решателем
+   так, чтобы сойтись с контрольными точками выписки:
+     · 273 384.31 — opening balance выписки на 15 апреля
+     · 284 647.22 — текущий остаток на 13 августа
    ========================================================================= */
 (function (global) {
   'use strict';
 
-  var TODAY = new Date(2026, 7, 13, 16, 51); // 13 August 2026
-
-  var MON_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
-                   'July', 'August', 'September', 'October', 'November', 'December'];
-
-  /* Требуемый общий баланс портфеля. Опорный остаток сберегательного счёта
-     подбирается под эту цифру, поэтому проводки и выписка остаются честными. */
-  var TARGET_PORTFOLIO = 284647.22;
+  var TODAY = new Date(2026, 7, 13, 16, 51);   // 13 August 2026
+  var PERIOD_START = new Date(2026, 2, 17);    // 17 March 2026
+  var OPENING = 228821.19;                     // остаток на начало периода
+  var ANCHOR_APR15 = 273384.31;                // контрольная точка из выписки
+  var TARGET_CLOSING = 284647.22;              // текущий остаток
 
   var BANK = {
-    name: 'Meridian Bank',
-    legal: 'Meridian Bank Limited',
-    reg: 'Reg. 2009/034118/06 · FSP 61294 · NCRCP 42',
+    name: 'Discovery Bank',
+    legal: 'Discovery Bank Limited',
+    reg: 'Reg. 2015/408745/06 · FSP 48657 · NCRCP 9997',
     branch: '679000',
-    swift: 'MRDNZAJJ',
-    address: '1 Rivonia Green, Sandton, 2196',
-    support: '0860 111 984',
+    swift: 'DISCZAJJ',
+    address: '1 Discovery Place, Sandton, 2196',
+    support: '0800 07 96 97',
     currency: 'ZAR',
     symbol: 'R'
   };
 
   var USER = {
-    username: 'thandi',
-    password: 'demo1234',
-    first: 'Thandi',
-    last: 'Mokoena',
-    initials: 'TM',
-    email: 'thandi.mokoena@example.co.za',
-    emailMasked: 't••••••.m••••••@example.co.za',
-    phoneMasked: '+27 •• ••• 4471',
-    idMasked: '9004•••••08 3',
-    address: ['12 Acacia Road', 'Melrose Arch', 'Johannesburg, 2196'],
-    client: '8841 2207',
-    since: 'March 2019',
+    username: '+27662582832',
+    password: '0605',
+    first: 'Charne',
+    last: 'Puren',
+    initials: 'CP',
+    email: 'charne.puren@example.co.za',
+    emailMasked: 'c•••••.p••••@example.co.za',
+    phoneMasked: '+27 •• ••• 2832',
+    idMasked: '9207•••••08 2',
+    address: ['24 Rietfontein Road', 'Boksburg', 'Gauteng, 1459'],
+    client: '4471 0298',
+    since: 'June 2021',
     tier: 'Gold'
   };
 
   var ACCOUNTS = [
     {
-      id: 'ac-everyday',
-      name: 'Everyday Gold',
+      id: 'ac-gold',
+      name: 'Discovery Gold Transaction Account',
+      shortName: 'Gold Transaction Account',
       type: 'Transaction account',
       kind: 'transaction',
-      number: '10298470551',
-      last4: '0551',
-      opening: 21480.22,
+      number: '14902470882',
+      last4: '0882',
+      opening: OPENING,
       art: 'light',
       network: 'VISA',
       tier: 'Gold',
-      pan: '4029 88•• •••• 4417',
+      pan: '4029 88•• •••• 2740',
       rate: 0
-    },
-    {
-      id: 'ac-savings',
-      name: 'Demand Savings',
-      type: 'Savings account',
-      kind: 'savings',
-      number: '10298471244',
-      last4: '1244',
-      opening: 61240.00,
-      art: 'vault',
-      network: '',
-      tier: 'Save',
-      pan: '',
-      rate: 6.85
-    },
-    {
-      id: 'ac-credit',
-      name: 'Gold Credit Card',
-      type: 'Credit card',
-      kind: 'credit',
-      number: '4029 88•• •••• 7731',
-      last4: '7731',
-      opening: -4120.55,
-      art: 'dark',
-      network: 'VISA',
-      tier: 'Credit',
-      pan: '4029 88•• •••• 7731',
-      limit: 45000,
-      rate: 18.25
     }
   ];
 
-  var CATEGORIES = {
-    income:        { label: 'Income',            icon: 'salary' },
-    transfer:      { label: 'Transfers',         icon: 'swap' },
-    savings:       { label: 'Savings Transfers', icon: 'piggy' },
-    groceries:     { label: 'Groceries',         icon: 'cart' },
-    dining:        { label: 'Eating Out',        icon: 'cup' },
-    transport:     { label: 'Transport',         icon: 'car' },
-    shopping:      { label: 'Shopping',          icon: 'bag' },
-    health:        { label: 'Health',            icon: 'heart' },
-    entertainment: { label: 'Entertainment',     icon: 'film' },
-    home:          { label: 'Home',              icon: 'house' },
-    utilities:     { label: 'Utilities',         icon: 'bolt' },
-    insurance:     { label: 'Insurance',         icon: 'shield' },
-    fees:          { label: 'Bank Fees',         icon: 'receipt' },
-    interest:      { label: 'Interest',          icon: 'chart' }
-  };
-
-  /* ---------- Merchant pool --------------------------------------------- */
-  var POOL = [
-    { m: 'Woolworths Food',      c: 'groceries',     lo: 180,  hi: 940,  ch: 'Card' },
-    { m: 'Checkers Hyper',       c: 'groceries',     lo: 140,  hi: 810,  ch: 'Card' },
-    { m: 'Pick n Pay',           c: 'groceries',     lo: 95,   hi: 640,  ch: 'Card' },
-    { m: 'SPAR Melrose',         c: 'groceries',     lo: 60,   hi: 350,  ch: 'Card' },
-    { m: 'Vida e Caffe',         c: 'dining',        lo: 38,   hi: 96,   ch: 'Card' },
-    { m: 'Kauai Rosebank',       c: 'dining',        lo: 68,   hi: 155,  ch: 'Card' },
-    { m: 'Ocean Basket',         c: 'dining',        lo: 210,  hi: 540,  ch: 'Card' },
-    { m: 'Uber Eats',            c: 'dining',        lo: 115,  hi: 395,  ch: 'Online' },
-    { m: 'Tashas Bryanston',     c: 'dining',        lo: 180,  hi: 470,  ch: 'Card' },
-    { m: 'Uber Trip',            c: 'transport',     lo: 48,   hi: 215,  ch: 'Online' },
-    { m: 'Shell Ultra City',     c: 'transport',     lo: 615,  hi: 1150, ch: 'Card' },
-    { m: 'Engen Melrose',        c: 'transport',     lo: 580,  hi: 1090, ch: 'Card' },
-    { m: 'Gautrain',             c: 'transport',     lo: 42,   hi: 186,  ch: 'Card' },
-    { m: 'Takealot.com',         c: 'shopping',      lo: 199,  hi: 1890, ch: 'Online' },
-    { m: 'Superbalist',          c: 'shopping',      lo: 250,  hi: 1240, ch: 'Online' },
-    { m: 'Cotton On',            c: 'shopping',      lo: 180,  hi: 690,  ch: 'Card' },
-    { m: 'Exclusive Books',      c: 'shopping',      lo: 130,  hi: 520,  ch: 'Card' },
-    { m: 'Clicks Pharmacy',      c: 'health',        lo: 85,   hi: 615,  ch: 'Card' },
-    { m: 'Dis-Chem',             c: 'health',        lo: 110,  hi: 880,  ch: 'Card' },
-    { m: 'Ster-Kinekor',         c: 'entertainment', lo: 120,  hi: 330,  ch: 'Card' },
-    { m: 'Spotify Premium',      c: 'entertainment', lo: 69,   hi: 70,   ch: 'Online' },
-    { m: 'Steam Games',          c: 'entertainment', lo: 149,  hi: 720,  ch: 'Online' },
-    { m: 'Builders Warehouse',   c: 'home',          lo: 210,  hi: 1420, ch: 'Card' },
-    { m: 'Eskom Prepaid',        c: 'utilities',     lo: 350,  hi: 900,  ch: 'App' }
+  var CARDS = [
+    { last4: '2740', name: 'Discovery Gold Card',    kind: 'Primary debit card',   pan: '4029 88•• •••• 2740' },
+    { last4: '9441', name: 'Discovery Virtual Card', kind: 'Virtual card, online', pan: '4029 88•• •••• 9441' }
   ];
+
+  var CATEGORIES = {
+    income:    { label: 'Income',            icon: 'salary' },
+    savings:   { label: 'Savings Transfers', icon: 'piggy' },
+    transfers: { label: 'Transfers',         icon: 'swap' },
+    groceries: { label: 'Groceries',         icon: 'cart' },
+    dining:    { label: 'Eating Out',        icon: 'cup' },
+    transport: { label: 'Transport',         icon: 'car' },
+    travel:    { label: 'Travel',            icon: 'travel' },
+    shopping:  { label: 'Shopping',          icon: 'bag' },
+    entertain: { label: 'Entertainment',     icon: 'film' },
+    home:      { label: 'Home',              icon: 'house' },
+    comms:     { label: 'Communication',     icon: 'phone' },
+    cash:      { label: 'Cash',              icon: 'bank' },
+    debt:      { label: 'Debt Repayment',    icon: 'chart' },
+    fees:      { label: 'Bank Fees',         icon: 'doc' },
+    other:     { label: 'Other',             icon: 'receipt' }
+  };
 
   /* ---------- Deterministic PRNG ---------------------------------------- */
   function rng(seed) {
     var s = seed >>> 0;
-    return function () {
-      s = (s * 1664525 + 1013904223) >>> 0;
-      return s / 4294967296;
-    };
+    return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
   }
-  var rand = rng(20260813);
-  function pick(arr) { return arr[Math.floor(rand() * arr.length)]; }
+  var rand = rng(20260317);
+  function pick(a) { return a[Math.floor(rand() * a.length)]; }
   function between(lo, hi) { return Math.round((lo + rand() * (hi - lo)) * 100) / 100; }
   function intBetween(lo, hi) { return lo + Math.floor(rand() * (hi - lo + 1)); }
   function round2(v) { return Math.round(v * 100) / 100; }
 
-  var refSeq = 4180;
-  function ref(prefix) {
-    refSeq += intBetween(3, 29);
-    return prefix + String(refSeq).padStart(6, '0');
-  }
-
-  /* ---------- Postings --------------------------------------------------- */
+  var ACC = ACCOUNTS[0].number;
+  var ACC_SAVINGS = '14902477096';   // «...7096» из межсчётного перевода в выписке
   var TX = [];
-  function add(accountId, date, merchant, category, amount, channel, extra) {
+  var refSeq = 3100;
+
+  /* type: POS Purchase | EFT | Online | Transfer | Fee */
+  function add(date, type, card, merchant, amount, category, extra) {
     extra = extra || {};
+    refSeq += intBetween(3, 27);
     TX.push({
       id: 'tx' + (TX.length + 1),
-      accountId: accountId,
+      accountId: 'ac-gold',
       date: date,
+      type: type,
+      card: card || '',
       merchant: merchant,
       category: category,
       amount: round2(amount),
-      channel: channel,
       note: extra.note || '',
-      from: extra.from || '',
-      to: extra.to || '',
-      ref: ref(amount > 0 ? 'CR' : 'DT')
+      from: extra.from || (amount < 0 ? ACC : ''),
+      to: extra.to || (amount > 0 ? ACC : ''),
+      ref: (amount > 0 ? 'CR' : 'DT') + String(refSeq).padStart(6, '0')
     });
+    return TX[TX.length - 1];
   }
-  function d(y, m, day, h, min) {
-    return new Date(y, m, day, h == null ? intBetween(7, 21) : h, min == null ? intBetween(0, 59) : min);
+
+  /* Правдоподобное время суток по типу проводки — в выписке его нет. */
+  function at(y, m, d, type) {
+    if (type === 'Fee') return new Date(y, m, d, 3, intBetween(5, 55));
+    if (type === 'EFT' || type === 'Transfer') return new Date(y, m, d, intBetween(6, 10), intBetween(0, 59));
+    return new Date(y, m, d, intBetween(8, 21), intBetween(0, 59));
   }
-  function lastDay(y, m) { return new Date(y, m + 1, 0).getDate(); }
 
-  var AC_EVERYDAY = ACCOUNTS[0].number, AC_SAVINGS = ACCOUNTS[1].number, AC_CREDIT = ACCOUNTS[2].number;
-  var MONTHS = [[2026, 4], [2026, 5], [2026, 6], [2026, 7]]; // May … August
-  var prevCardSpend = 3980.40; // April card balance carried into May
+  /* ================================================================= */
+  /* Блок 1. 17 марта — 14 апреля: сгенерирован в логике выписки       */
+  /* ================================================================= */
 
-  MONTHS.forEach(function (ym) {
-    var y = ym[0], m = ym[1];
-    var maxDay = (m === TODAY.getMonth() && y === TODAY.getFullYear()) ? TODAY.getDate() : lastDay(y, m);
-    var full = maxDay === lastDay(y, m);
+  /* ЮАР-период: те же торговые точки, что в апрельской части выписки */
+  var POOL_ZA = [
+    ['Superspar The Squar', 'groceries', 60, 340],
+    ['Sasol Rietfontein',   'transport', 45, 620],
+    ['Yoco *Plato Boksb',   'dining',    38, 260],
+    ['Yoco *Jayz Joint',    'dining',    95, 390],
+    ['Cappello Boksburg10', 'dining',    80, 320],
+    ['Xpresso 19',          'dining',    20, 90],
+    ['Postnet East Rand C', 'other',     21, 180],
+    ['Neva Neolin',         'other',     95, 240],
+    ['DI Uber',             'transport', 45, 180],
+    ['DI Bolt',             'transport', 38, 150],
+    ['DI New Uber Eats',    'dining',    95, 310],
+    ['Hpy*Sirjana Cell',    'comms',     120, 340],
+    ['Mrd',                 'other',     80, 220],
+    ['Checkers Rietfontn',  'groceries', 110, 480]
+  ];
 
-    /* — recurring debit orders on the transaction account — */
-    var fixed = [
-      [1,  'Sandton Lofts Rentals',  'home',          -12500,  'Debit order', 'Monthly rent'],
-      [2,  'Bluewater Medical',      'health',        -2890,   'Debit order', 'Medical plan'],
-      [3,  'Virgin Active',          'health',        -899,    'Debit order', 'Gym membership'],
-      [5,  'Cape Shield Insure',     'insurance',     -1240.5, 'Debit order', 'Car and home cover'],
-      [7,  'Vodacom',                'utilities',     -749,    'Debit order', 'Mobile contract'],
-      [11, 'City of Joburg',         'utilities',     -1186.4, 'Debit order', 'Water and refuse'],
-      [15, 'Netflix SA',             'entertainment', -199,    'Online',      'Standard plan'],
-      [15, 'Monthly account fee',    'fees',          -69,     'System',      'Everyday Gold bundle']
-    ];
-    fixed.forEach(function (f) {
-      if (f[0] <= maxDay) {
-        add('ac-everyday', d(y, m, f[0], 3, intBetween(10, 55)), f[1], f[2], f[3], f[4],
-          { note: f[5], from: AC_EVERYDAY });
-      }
-    });
+  var swiftSeq = 0;
+  var SWIFT_CODES = ['RO26Wq4Lm10', 'RO26Vb7Nx40', 'RO26T6F720', 'RO26Sbb130', 'RO26Rq0Kr0',
+                     'RO26R9Mcj0', 'RO26Qdnl60', 'RO26Pphg90', 'RO26M1L920', 'RO26Kt3Vd80'];
 
-    /* — salary — */
-    if (25 <= maxDay) {
-      add('ac-everyday', d(y, m, 25, 6, 12), 'Northgate Analytics (Pty) Ltd', 'income', 38500, 'EFT credit',
-        { note: 'Monthly salary', to: AC_EVERYDAY });
-    }
+  function swift(y, m, d, amount, weeks) {
+    var code = SWIFT_CODES[swiftSeq++ % SWIFT_CODES.length];
+    return add(at(y, m, d, 'EFT'), 'EFT', '', 'Inward SWIFT ' + code + ' Wise Payments',
+      amount, 'income', { note: 'Payslip weeks ' + weeks, from: 'Wise Payments' });
+  }
 
-    /* — monthly savings transfer, both legs — */
-    if (26 <= maxDay) {
-      add('ac-everyday', d(y, m, 26, 8, 5), 'Savings for ' + MON_NAMES[m], 'savings', -4000, 'Transfer',
-        { note: 'Standing transfer', from: AC_EVERYDAY, to: AC_SAVINGS });
-      add('ac-savings',  d(y, m, 26, 8, 5), 'Savings for ' + MON_NAMES[m], 'savings', 4000, 'Transfer',
-        { note: 'Standing transfer', from: AC_EVERYDAY, to: AC_SAVINGS });
-    }
+  /* зарплатные поступления раз в две недели */
+  swift(2026, 2, 21, 29148.63, '7-8');
+  swift(2026, 3, 4, 30112.45, '9-10');
 
-    /* — credit card settlement for the previous month — */
-    if (28 <= maxDay) {
-      var pay = round2(prevCardSpend);
-      add('ac-everyday', d(y, m, 28, 9, 30), 'Credit card payment', 'transfer', -pay, 'Transfer',
-        { note: 'Full statement settled', from: AC_EVERYDAY, to: AC_CREDIT });
-      add('ac-credit',   d(y, m, 28, 9, 30), 'Credit card payment', 'transfer',  pay, 'Transfer',
-        { note: 'Full statement settled', from: AC_EVERYDAY, to: AC_CREDIT });
-    }
+  /* регулярные списания */
+  add(at(2026, 2, 20, 'Online'), 'Online', '9441', 'Netflix Za', -99.00, 'entertain');
+  add(at(2026, 2, 25, 'POS Purchase'), 'POS Purchase', '2740', 'Spotifyza', -69.99, 'entertain');
+  add(at(2026, 3, 1, 'EFT'), 'EFT', '', 'Rent Boksburgirene', -4990.00, 'home', { note: 'Monthly rent' });
+  add(at(2026, 3, 1, 'EFT'), 'EFT', '', 'Phone Payment', -350.00, 'comms');
+  add(at(2026, 3, 7, 'Fee'), 'Fee', '', 'Monthly Account Fee', -275.00, 'fees');
+  add(at(2026, 3, 7, 'Fee'), 'Fee', '', 'Service Fees', -85.00, 'fees');
+  add(at(2026, 3, 9, 'Online'), 'Online', '9441', 'Netflix Za', -99.00, 'entertain');
+  add(at(2026, 3, 12, 'EFT'), 'EFT', '', 'Off-Us Debt', -3200.00, 'debt');
 
-    /* — card spend on the transaction account — */
-    var nEveryday = full ? intBetween(19, 25) : Math.max(6, Math.round(maxDay * 0.72));
-    for (var i = 0; i < nEveryday; i++) {
-      var p = pick(POOL);
-      add('ac-everyday', d(y, m, intBetween(1, maxDay)), p.m, p.c, -between(p.lo, p.hi), p.ch, { from: AC_EVERYDAY });
-    }
-
-    /* — credit card spend — */
-    var cardSpend = 0;
-    var nCard = full ? intBetween(8, 13) : Math.max(3, Math.round(maxDay * 0.35));
-    for (var j = 0; j < nCard; j++) {
-      var q = pick(POOL);
-      var amt = between(q.lo, q.hi);
-      cardSpend += amt;
-      add('ac-credit', d(y, m, intBetween(1, maxDay)), q.m, q.c, -amt, q.ch, { from: AC_CREDIT });
-    }
-    prevCardSpend = cardSpend;
-
-    /* — interest on the savings account, last day of the month — */
-    if (full) {
-      add('ac-savings', d(y, m, maxDay, 23, 45), 'Credit interest', 'interest', 0, 'System',
-        { note: '6.85% per annum', to: AC_SAVINGS });
-    }
-
-    /* — one-off withdrawal from savings — */
-    if (m === 5) {
-      add('ac-savings',  d(y, m, 18, 14, 20), 'Car repairs', 'transfer', -7500, 'Transfer',
-        { note: 'Own transfer', from: AC_SAVINGS, to: AC_EVERYDAY });
-      add('ac-everyday', d(y, m, 18, 14, 20), 'Car repairs', 'transfer',  7500, 'Transfer',
-        { note: 'Own transfer', from: AC_SAVINGS, to: AC_EVERYDAY });
-    }
+  /* карточные покупки */
+  var genDays = [17, 18, 19, 22, 23, 26, 27, 29, 30, 31];  // март
+  genDays.forEach(function (d) {
+    var p = pick(POOL_ZA);
+    add(at(2026, 2, d, 'POS Purchase'), 'POS Purchase', rand() < 0.82 ? '2740' : '9441', p[0], -between(p[2], p[3]), p[1]);
+  });
+  [2, 3, 5, 6, 8, 9, 11, 13, 14].forEach(function (d) {   // апрель
+    var p = pick(POOL_ZA);
+    add(at(2026, 3, d, 'POS Purchase'), 'POS Purchase', rand() < 0.82 ? '2740' : '9441', p[0], -between(p[2], p[3]), p[1]);
   });
 
-  /* ---------- Chronology, interest and closing balances ------------------ */
+  /* подгоночный перевод в накопления — считается ниже решателем */
+  var anchorTx = add(at(2026, 3, 10, 'Transfer'), 'Transfer', '', 'Savings For 90 Days',
+    -1, 'savings', { to: ACC_SAVINGS });
+
+  /* ================================================================= */
+  /* Блок 2. 15 апреля — 28 июля: строки выписки без изменений         */
+  /* ================================================================= */
+
+  /* [день, месяц(0-based), тип, карта, назначение, сумма, категория, примечание] */
+  var STATEMENT = [
+    [15, 3, 'POS Purchase', '2740', 'Sasol Rietfontein', -56.50, 'transport'],
+    [16, 3, 'POS Purchase', '2740', 'Superspar The Squar', -16.24, 'groceries'],
+    [18, 3, 'POS Purchase', '2740', 'Yoco *Plato Boksb', -55.20, 'dining'],
+    [18, 3, 'EFT', '', 'Inward SWIFT RO26T6F720 Wise Payments', 31725.61, 'income', 'Payslip weeks 11-12'],
+    [18, 3, 'POS Purchase', '9441', 'Mrd', -158.40, 'other'],
+    [18, 3, 'POS Purchase', '2740', 'Superspar The Squar', -223.04, 'groceries'],
+    [20, 3, 'POS Purchase', '2740', 'Superspar The Squar', -120.65, 'groceries'],
+    [20, 3, 'Online', '9441', 'Netflix Za', -99.00, 'entertain'],
+    [21, 3, 'POS Purchase', '2740', 'Hpy*Sirjana Cell', -300.55, 'comms'],
+    [21, 3, 'Transfer', '', 'Inter account transfer to account...7096 M', 50.00, 'transfers'],
+    [21, 3, 'POS Purchase', '2740', 'Yoco *Plato Boksb', -51.60, 'dining'],
+    [23, 3, 'POS Purchase', '2740', 'Superspar The Squar', -297.38, 'groceries'],
+    [23, 3, 'POS Purchase', '2740', 'Yoco *Jayz Joint', -380.00, 'dining'],
+    [24, 3, 'POS Purchase', '2740', '9.47 12Go', -182.89, 'travel'],
+    [25, 3, 'Fee', '', 'Debit Order fee', -2.00, 'fees'],
+    [25, 3, 'Online', '', 'Phone Payment', -350.00, 'comms'],
+    [25, 3, 'Transfer', '', 'Savings For 90 Days', -28666.97, 'savings'],
+
+    [1, 4, 'POS Purchase', '2740', 'Superspar The Squar', -140.26, 'groceries'],
+    [2, 4, 'POS Purchase', '2740', 'Xpresso 19', -20.00, 'dining'],
+    [2, 4, 'POS Purchase', '2740', 'Sasol Rietfontein', -130.00, 'transport'],
+    [4, 4, 'POS Purchase', '2740', 'Cappello Boksburg10', -286.49, 'dining'],
+    [5, 4, 'EFT', '', 'Inward SWIFT RO26Sbb130 Wise Payments', 28213.51, 'income', 'Payslip weeks 13-14'],
+    [5, 4, 'POS Purchase', '2740', 'Postnet East Rand C', -21.00, 'other'],
+    [5, 4, 'POS Purchase', '9441', 'DI New Uber Eats', -136.28, 'dining'],
+    [6, 4, 'POS Purchase', '2740', 'Neva Neolin', -187.05, 'other'],
+    [6, 4, 'POS Purchase', '9441', 'DI Uber', -78.00, 'transport'],
+    [7, 4, 'POS Purchase', '2740', 'Dubai Duty Free', -235.20, 'shopping'],
+    [7, 4, 'Transfer', '', 'Savings For 90 Days', -10000.00, 'savings'],
+    [7, 4, 'Fee', '', 'Monthly Account Fee', -275.00, 'fees'],
+    [7, 4, 'Fee', '', 'Service Fees', -85.00, 'fees'],
+    [8, 4, 'POS Purchase', '2740', 'DI Bolt', -47.00, 'transport'],
+    [12, 4, 'POS Purchase', '2740', "Lotus'S 6447 Koh Ph", -407.54, 'groceries'],
+    [14, 4, 'EFT', '', 'International Cash 25250.00 Lotus', -13329.60, 'cash'],
+    [15, 4, 'POS Purchase', '9441', 'Kiteflip.Co', -2182.61, 'shopping'],
+    [19, 4, 'EFT', '', 'Inward SWIFT RO26Rq0Kr0 Wise Payments', 30550.21, 'income', 'Payslip weeks 15-16'],
+    [20, 4, 'POS Purchase', '2740', '711 Hatchaophao', -123.94, 'groceries'],
+    [20, 4, 'EFT', '', 'Rent Boksburgirene', -4990.00, 'home'],
+    [20, 4, 'Online', '9441', 'Netflix Za', -99.00, 'entertain'],
+    [22, 4, 'EFT', '', 'International Cash 6250.00 K.Sira', -3312.94, 'cash'],
+    [25, 4, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -74.74, 'dining'],
+    [25, 4, 'POS Purchase', '2740', 'Spotifyza', -69.99, 'entertain'],
+    [29, 4, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -92.72, 'dining'],
+
+    [1, 5, 'POS Purchase', '2740', 'Pttst.D Sriphom Pet', -97.88, 'other'],
+    [1, 5, 'POS Purchase', '2740', '7 11 Kophangan Serv', -128.27, 'groceries'],
+    [1, 5, 'EFT', '', 'International Cash 16250.00 Seeth', -8370.74, 'cash'],
+    [2, 5, 'POS Purchase', '2740', '711 Ban Sithanu', -167.41, 'groceries'],
+    [2, 5, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -257.56, 'dining'],
+    [3, 5, 'POS Purchase', '2740', '711 Kophangan Serv', -105.08, 'groceries'],
+    [3, 5, 'EFT', '', 'Phone Payment', -280.00, 'comms'],
+    [3, 5, 'EFT', '', 'Sussa', -650.00, 'other'],
+    [3, 5, 'EFT', '', 'Payshap Account Off-Us Emergency Funds.', -1000.00, 'transfers'],
+    [3, 5, 'POS Purchase', '2740', 'S2S*Valuecobayside', -3100.00, 'shopping'],
+    [4, 5, 'EFT', '', 'Inward SWIFT RO26R9Mcj0 Wise Payments', 29374.28, 'income', 'Payslip weeks 17-18'],
+    [4, 5, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -180.61, 'dining'],
+    [4, 5, 'EFT', '', 'Off-Us Debt', -7100.00, 'debt'],
+    [5, 5, 'POS Purchase', '2740', "Lotus'S 6447 Koh Ph", -724.39, 'groceries'],
+    [5, 5, 'EFT', '', 'International Cash 18250.00 Seeth', -9409.34, 'cash'],
+    [6, 5, 'Fee', '', 'Monthly Account Fee', -275.00, 'fees'],
+    [6, 5, 'Fee', '', 'Service Fees', -425.00, 'fees'],
+    [8, 5, 'EFT', '', 'International Cash 13250.00 Koh P', -6934.60, 'cash'],
+    [17, 5, 'EFT', '', 'Travel', -12000.00, 'travel'],
+    [17, 5, 'Transfer', '2740', 'Savings For 90 Days', 5000.00, 'savings'],
+    [18, 5, 'EFT', '9441', 'Inward SWIFT RO26Qdnl60 Wise Payments', 29375.28, 'income', 'Payslip weeks 19-20'],
+    [18, 5, 'POS Purchase', '', 'Zama Resort Koh Pha', -159.33, 'dining'],
+    [19, 5, 'Online', '9441', 'Netflix Za', -99.00, 'entertain'],
+    [19, 5, 'EFT', '', 'International Cash 10250.00 7-11', -5267.99, 'cash'],
+    [25, 5, 'POS Purchase', '2740', '7 11 Ban Sithanu', -150.48, 'groceries'],
+    [26, 5, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -200.75, 'dining'],
+    [28, 5, 'POS Purchase', '2740', '7 11 Kophangan Serv', -120.33, 'groceries'],
+    [30, 5, 'POS Purchase', '2740', 'Spotifyza', -69.99, 'entertain'],
+    [30, 5, 'EFT', '', 'International Cash 9750.00 7-11 B', -4979.41, 'cash'],
+
+    [1, 6, 'EFT', '', 'Rent - Boksburgirene', -4990.00, 'home'],
+    [1, 6, 'EFT', '', 'Off-Us Phone Payment', -350.00, 'comms'],
+    [1, 6, 'EFT', '', 'Debt', -2000.00, 'debt'],
+    [2, 6, 'EFT', '', 'International Cash 30250.00 7-11', -15429.19, 'cash'],
+    [4, 6, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -300.45, 'dining'],
+    [5, 6, 'EFT', '', 'Inward SWIFT RO26Pphg90 Wise Payments', 25852.12, 'income', 'Payslip weeks 21-22'],
+    [7, 6, 'Fee', '', 'Monthly Account Fee', -285.00, 'fees'],
+    [7, 6, 'Fee', '', 'Service Fees', -425.00, 'fees'],
+    [9, 6, 'POS Purchase', '2740', "Lotus'S 6447 Koh Ph", -500.89, 'groceries'],
+    [13, 6, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -450.21, 'dining'],
+    [15, 6, 'Transfer', '', 'Savings For 90 Days', -25000.00, 'savings'],
+    [16, 6, 'Online', '9441', 'Netflix Za', -99.00, 'entertain'],
+    [18, 6, 'POS Purchase', '2740', '7 11 Ban Sithanu', -120.73, 'groceries'],
+    [19, 6, 'EFT', '', 'Inward SWIFT RO26M1L920 Wise Payments', 32898.88, 'income', 'Payslip weeks 23-24'],
+    [20, 6, 'EFT', '', 'International Cash 10250.00 7-11', -5267.99, 'cash'],
+    [22, 6, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -250.60, 'dining'],
+    [24, 6, 'POS Purchase', '9441', '7 11 Kophangan Serv', -110.42, 'groceries'],
+    [26, 6, 'POS Purchase', '2740', 'Zama Resort Koh Pha', -150.37, 'dining'],
+    [27, 6, 'POS Purchase', '', 'International Cash 24250.00 Samui', -12960.07, 'cash'],
+    [28, 6, 'POS Purchase', '2740', '7 11 Chaweng Samui', -200.22, 'groceries'],
+    [28, 6, 'POS Purchase', '2740', 'W Koh Samui', -4500.15, 'travel'],
+    [28, 6, 'POS Purchase', '2740', 'Spotifyza', -69.99, 'entertain']
+  ];
+
+  STATEMENT.forEach(function (r) {
+    var extra = { note: r[7] || '' };
+    if (r[4].indexOf('Inward SWIFT') === 0) extra.from = 'Wise Payments';
+    if (r[4].indexOf('Savings For 90 Days') === 0) extra[r[5] < 0 ? 'to' : 'from'] = ACC_SAVINGS;
+    if (r[4].indexOf('Inter account transfer') === 0) extra.from = ACC_SAVINGS;
+    add(at(2026, r[1], r[0], r[2]), r[2], r[3], r[4], r[5], r[6], extra);
+  });
+
+  /* ================================================================= */
+  /* Блок 3. Август: сгенерирован, 10 проводок                         */
+  /* ================================================================= */
+
+  add(at(2026, 7, 1, 'EFT'), 'EFT', '', 'Rent - Boksburgirene', -4990.00, 'home', { note: 'Monthly rent' });
+  add(at(2026, 7, 3, 'POS Purchase'), 'POS Purchase', '2740', 'Zama Resort Koh Pha', -285.40, 'dining');
+  add(at(2026, 7, 5, 'POS Purchase'), 'POS Purchase', '2740', '7 11 Chaweng Samui', -160.85, 'groceries');
+  add(at(2026, 7, 7, 'Fee'), 'Fee', '', 'Monthly Account Fee', -285.00, 'fees');
+  add(at(2026, 7, 7, 'Fee'), 'Fee', '', 'Service Fees', -425.00, 'fees');
+  add(at(2026, 7, 9, 'POS Purchase'), 'POS Purchase', '2740', "Lotus'S 6447 Koh Ph", -612.30, 'groceries');
+  add(at(2026, 7, 11, 'Online'), 'Online', '9441', 'Netflix Za', -99.00, 'entertain');
+  add(at(2026, 7, 12, 'EFT'), 'EFT', '', 'International Cash 12250.00 Samui', -6318.47, 'cash');
+  add(new Date(2026, 7, 13, 7, 22), 'EFT', '', 'Inward SWIFT RO26Kt3Vd80 Wise Payments', 28717.18, 'income',
+    { note: 'Payslip weeks 25-26', from: 'Wise Payments' });
+
+  /* подгоночный перевод в накопления — считается решателем ниже */
+  var closingTx = add(new Date(2026, 7, 13, 9, 40), 'Transfer', '', 'Savings For 90 Days',
+    -1, 'savings', { to: ACC_SAVINGS });
+
+  /* ================================================================= */
+  /* Хронология, решатель и остатки                                    */
+  /* ================================================================= */
   TX.sort(function (a, b) { return a.date - b.date; });
 
-  function computeBalances() {
-    var bal = {};
-    ACCOUNTS.forEach(function (a) { bal[a.id] = a.opening; });
+  function runBalances() {
+    var bal = OPENING;
     TX.forEach(function (t) {
-      if (t.category === 'interest') {
-        // проценты считаются от фактического остатка, поэтому пересчитываются
-        // на каждой итерации подбора опорного баланса
-        t.amount = round2(bal[t.accountId] * 0.0685 / 12);
-        t.ref = 'CR' + t.ref.slice(2);
-      }
-      bal[t.accountId] = round2(bal[t.accountId] + t.amount);
-      t.balanceAfter = bal[t.accountId];
+      bal = round2(bal + t.amount);
+      t.balanceAfter = bal;
     });
     return bal;
   }
 
-  /* Подбираем опорный остаток сберегательного счёта так, чтобы портфель сошёлся
-     с TARGET_PORTFOLIO. Проценты зависят от остатка, поэтому итерируем: каждый
-     проход уменьшает невязку примерно в 175 раз. */
-  var savingsAcc = ACCOUNTS[1], balances;
-  for (var pass = 0; pass < 12; pass++) {
-    balances = computeBalances();
-    var total = round2(ACCOUNTS.reduce(function (s, a) { return s + balances[a.id]; }, 0));
-    var diff = round2(TARGET_PORTFOLIO - total);
-    if (diff === 0) break;
-    savingsAcc.opening = round2(savingsAcc.opening + diff);
+  /* остаток непосредственно перед первой проводкой выписки (15 апреля) */
+  var APR15 = new Date(2026, 3, 15, 0, 0, 0);
+  function balanceBeforeApr15() {
+    var bal = OPENING;
+    for (var i = 0; i < TX.length; i++) {
+      if (TX[i].date >= APR15) break;
+      bal = round2(bal + TX[i].amount);
+    }
+    return bal;
   }
 
-  ACCOUNTS.forEach(function (a) {
-    a.balance = balances[a.id];
-    a.available = a.kind === 'credit' ? round2(a.limit + a.balance) : a.balance;
-  });
+  // 1) подгоняем блок 1 под opening balance выписки
+  anchorTx.amount = round2(anchorTx.amount - (balanceBeforeApr15() - ANCHOR_APR15));
+  // 2) подгоняем август под текущий остаток
+  closingTx.amount = round2(closingTx.amount - (runBalances() - TARGET_CLOSING));
+  runBalances();
+
+  var closing = TX[TX.length - 1].balanceAfter;
+  ACCOUNTS[0].balance = closing;
+  ACCOUNTS[0].available = closing;
 
   TX.reverse(); // newest first
 
   /* ---------- Derived slices --------------------------------------------- */
   function txFor(accountId, from, to) {
     return TX.filter(function (t) {
-      if (accountId && accountId !== 'all' && t.accountId !== accountId) return false;
       if (from && t.date < from) return false;
       if (to && t.date > to) return false;
       return true;
@@ -1283,9 +1358,8 @@ h1,h2,h3,p{ margin:0; }
     return { in: round2(inn), out: round2(out), fees: round2(fees), net: round2(inn - out) };
   }
 
-  /* Переводы между своими счетами и погашение карты расходом не считаются:
-     деньги остаются у клиента. Бюджет и анализатор работают без них. */
-  var INTERNAL = ['transfer', 'savings'];
+  /* Переводы на собственные накопления расходом не считаются. */
+  var INTERNAL = ['savings', 'transfers'];
   function spend(list) {
     return round2(list.reduce(function (s, t) {
       return (t.amount < 0 && INTERNAL.indexOf(t.category) === -1) ? s - t.amount : s;
@@ -1304,10 +1378,8 @@ h1,h2,h3,p{ margin:0; }
   }
 
   function openingBalanceAt(accountId, from) {
-    var before = TX.filter(function (t) { return t.accountId === accountId && t.date < from; });
-    if (before.length) return before[0].balanceAfter; // TX отсортирован по убыванию
-    var acc = ACCOUNTS.filter(function (a) { return a.id === accountId; })[0];
-    return acc ? acc.opening : 0;
+    var before = TX.filter(function (t) { return t.date < from; });
+    return before.length ? before[0].balanceAfter : OPENING;
   }
 
   /* ---------- Dashboard widgets ------------------------------------------ */
@@ -1320,7 +1392,7 @@ h1,h2,h3,p{ margin:0; }
     { id: 'property', label: 'Property', icon: 'house',   p: 12 }
   ];
 
-  /* Бюджет выводим из истории: средний расход по завершённым месяцам плюс 8%. */
+  /* Бюджет — средний расход по завершённым месяцам плюс 8%. */
   var BUDGET = (function () {
     var m = {}, done = {};
     TX.forEach(function (t) {
@@ -1329,7 +1401,7 @@ h1,h2,h3,p{ margin:0; }
       m[k] = (m[k] || 0) + -t.amount;
       if (!(t.date.getFullYear() === TODAY.getFullYear() && t.date.getMonth() === TODAY.getMonth())) done[k] = true;
     });
-    var keys = Object.keys(done);
+    var keys = Object.keys(done).filter(function (k) { return k !== '2026-2'; }); // март неполный
     if (!keys.length) return 20000;
     var avg = keys.reduce(function (s, k) { return s + m[k]; }, 0) / keys.length;
     return Math.round(avg * 1.08 / 100) * 100;
@@ -1337,9 +1409,12 @@ h1,h2,h3,p{ margin:0; }
 
   global.DB = {
     TODAY: TODAY,
+    PERIOD_START: PERIOD_START,
+    OPENING: OPENING,
     BANK: BANK,
     USER: USER,
     ACCOUNTS: ACCOUNTS,
+    CARDS: CARDS,
     CATEGORIES: CATEGORIES,
     TX: TX,
     BEHAVIOURS: BEHAVIOURS,
@@ -1350,21 +1425,14 @@ h1,h2,h3,p{ margin:0; }
     spend: spend,
     byCategory: byCategory,
     openingBalanceAt: openingBalanceAt,
-    account: function (id) { return ACCOUNTS.filter(function (a) { return a.id === id; })[0]; },
-    portfolio: function () {
-      return round2(ACCOUNTS.reduce(function (s, a) { return s + a.balance; }, 0));
-    },
-    /* Доступно = собственные деньги. Кредитный лимит сюда не попадает. */
-    portfolioAvailable: function () {
-      return round2(ACCOUNTS.reduce(function (s, a) {
-        return a.kind === 'credit' ? s : s + a.available;
-      }, 0));
-    }
+    account: function (id) { return ACCOUNTS.filter(function (a) { return a.id === id; })[0] || ACCOUNTS[0]; },
+    portfolio: function () { return ACCOUNTS[0].balance; },
+    portfolioAvailable: function () { return ACCOUNTS[0].available; }
   };
 })(window);
 
 /* =========================================================================
-   Meridian Bank — mockup logic.
+   Discovery Bank — mockup logic.
    String templates for rendering, one delegated click handler, screen
    transitions via cloned .screen nodes. No dependencies.
    ========================================================================= */
@@ -1376,7 +1444,7 @@ h1,h2,h3,p{ margin:0; }
   var viewport = $('#viewport'), appbarEl = $('#appbar'), tabbarEl = $('#tabbar'),
       sheetLayer = $('#sheetLayer'), sheetEl = $('#sheet'), toastLayer = $('#toastLayer');
 
-  var STORE_KEY = 'meridian-mock-v1';
+  var STORE_KEY = 'discovery-mock-v1';
 
   /* ---------------------------------------------------------------- 1. State */
   var S = {
@@ -1386,7 +1454,7 @@ h1,h2,h3,p{ margin:0; }
     authed: false,
     hide: false,
     frozen: false,
-    tx: { q: '', month: 'all', account: 'all' },
+    tx: { q: '', month: 'all', card: 'all' },
     order: null,
     requests: []
   };
@@ -1498,7 +1566,7 @@ h1,h2,h3,p{ margin:0; }
   function plastic(acc, big) {
     var cls = 'plastic' + (acc.art === 'dark' ? ' plastic--dark' : acc.art === 'vault' ? ' plastic--vault' : '') + (big ? ' plastic--big' : '');
     return '<div class="' + cls + '">' +
-      '<div class="plastic__top">' + icon('mark', { w: 1.5 }) + '<span class="plastic__brand">Meridian</span></div>' +
+      '<div class="plastic__top">' + icon('mark', { w: 1.5 }) + '<span class="plastic__brand">Discovery</span></div>' +
       '<span class="plastic__wave">' + icon('wave', { w: 1.8 }) + '</span>' +
       '<div class="plastic__chip"></div>' +
       (big ? '' : '<div class="plastic__mark">' + icon('mark', { w: 1.1 }) + '</div>') +
@@ -1512,11 +1580,15 @@ h1,h2,h3,p{ margin:0; }
   /* Мета-блок строки операции: тип, счета, категория — каждая строка отдельно,
      как в приложении-референсе. У расхода сначала «To:», у прихода — «From:». */
   function txMeta(t) {
-    var lines = [t.channel];
-    if (t.from && t.to) {
-      lines = lines.concat(t.amount < 0 ? ['To: ' + t.to, 'From: ' + t.from] : ['From: ' + t.from, 'To: ' + t.to]);
-    } else if (t.from || t.to) {
-      lines.push(t.from || t.to);
+    var acc = DB.ACCOUNTS[0].number;
+    var lines = [t.type];
+    var counter = t.from === acc ? t.to : t.from;
+    if (counter && counter !== acc) {
+      lines = lines.concat(t.amount < 0
+        ? ['To: ' + counter, 'From: ' + acc]
+        : ['From: ' + counter, 'To: ' + acc]);
+    } else {
+      lines.push(acc);
     }
     lines.push(cat(t.category).label);
     return lines.map(function (l) { return '<span class="tx__meta">' + esc(l) + '</span>'; }).join('');
@@ -1574,7 +1646,6 @@ h1,h2,h3,p{ margin:0; }
         '<button class="field__link" data-action="forgot">Forgot password?</button>' +
       '</div>' +
       '<div class="login__spacer"></div>' +
-      '<div class="login__hint">Demo access: <b>thandi</b> / <b>demo1234</b>. All data is fictional and no payments are processed.</div>' +
       '<div class="btnrow">' +
         '<button class="btn btn--ghost" data-action="login-clear">Cancel</button>' +
         '<button class="btn btn--primary" data-action="login">Log in</button>' +
@@ -1585,9 +1656,11 @@ h1,h2,h3,p{ margin:0; }
   function doLogin() {
     var u = $('#f-user'), p = $('#f-pass');
     if (!u.value.trim() || !p.value) { toast('Please enter your credentials to log in'); return; }
-    if (u.value.trim().toLowerCase() !== DB.USER.username || p.value !== DB.USER.password) {
-      toast('Incorrect username or password'); return;
-    }
+    // номер телефона сверяем по цифрам: +27 66 258 2832 и 0662582832 равнозначны
+    var typed = u.value.replace(/[\s()-]/g, '');
+    var expect = DB.USER.username;
+    var ok = typed === expect || typed === expect.replace(/^\+27/, '0');
+    if (!ok || p.value !== DB.USER.password) { toast('Incorrect username or password'); return; }
     S.authed = true;
     S.stack = [];
     save();
@@ -1632,7 +1705,7 @@ h1,h2,h3,p{ margin:0; }
       '<span class="acard__art">' + plastic(DB.ACCOUNTS[0]) + '</span>' +
       '<span class="acard__body">' +
         '<span class="acard__name">Bank Portfolio</span>' +
-        '<span class="acard__type">' + DB.ACCOUNTS.length + ' accounts</span>' +
+        '<span class="acard__type">' + DB.ACCOUNTS.length + (DB.ACCOUNTS.length === 1 ? ' account' : ' accounts') + '</span>' +
         '<span class="acard__amt num">' + money(total) + '</span>' +
         '<span class="acard__lbl">Total balance</span>' +
         '<span class="acard__amt acard__amt--2 num">' + money(avail) + '</span>' +
@@ -1643,8 +1716,8 @@ h1,h2,h3,p{ margin:0; }
       return '<button class="acard" data-action="account" data-id="' + a.id + '">' +
         '<span class="acard__art">' + plastic(a) + '</span>' +
         '<span class="acard__body">' +
-          '<span class="acard__name">' + esc(a.name) + '</span>' +
-          '<span class="acard__type">' + esc(a.type) + ' · ' + esc(a.last4) + '</span>' +
+          '<span class="acard__name">' + esc(a.shortName || a.name) + '</span>' +
+          '<span class="acard__type">' + esc(a.number) + '</span>' +
           '<span class="acard__amt num">' + moneySigned(a.balance) + '</span>' +
           '<span class="acard__lbl">' + (a.kind === 'credit' ? 'Outstanding balance' : 'Total balance') + '</span>' +
           '<span class="acard__amt acard__amt--2 num">' + money(a.available) + '</span>' +
@@ -1680,7 +1753,7 @@ h1,h2,h3,p{ margin:0; }
 
       '<div class="momentum">' +
         '<div class="momentum__head">' +
-          '<span class="momentum__title">Momentum Money</span>' +
+          '<span class="momentum__title">Vitality Money</span>' +
           '<button class="momentum__status" data-action="momentum">Bronze Status' + icon('chevron', { w: 2 }) + '</button>' +
         '</div>' +
         '<div class="panel"><div class="panel__title">Financial Behaviours</div>' +
@@ -1716,7 +1789,7 @@ h1,h2,h3,p{ margin:0; }
     var rows = DB.ACCOUNTS.map(function (a) {
       return '<button class="row" data-action="account" data-id="' + a.id + '">' +
         '<span class="row__ic">' + icon(a.kind === 'credit' ? 'cards' : a.kind === 'savings' ? 'piggy' : 'bank') + '</span>' +
-        '<span class="row__body"><span class="row__label">' + esc(a.name) + '</span>' +
+        '<span class="row__body"><span class="row__label">' + esc(a.shortName || a.name) + '</span>' +
           '<span class="row__sub">' + esc(a.type) + ' · ' + esc(a.number) + '</span></span>' +
         '<span class="row__meta"><span class="num">' + moneySigned(a.balance) + '</span>' +
           '<span class="row__sub num">' + money(a.available) + ' available</span></span>' +
@@ -1785,12 +1858,14 @@ h1,h2,h3,p{ margin:0; }
       from = monthStart(+parts[0], +parts[1]);
       to = monthEnd(+parts[0], +parts[1]);
     }
-    var list = DB.txFor(S.tx.account, from, to);
+    var list = DB.txFor(null, from, to);
+    if (S.tx.card !== 'all') list = list.filter(function (t) { return t.card === S.tx.card; });
     var q = S.tx.q.trim().toLowerCase();
     if (q) {
       list = list.filter(function (t) {
         return t.merchant.toLowerCase().indexOf(q) !== -1 ||
                cat(t.category).label.toLowerCase().indexOf(q) !== -1 ||
+               t.type.toLowerCase().indexOf(q) !== -1 ||
                t.ref.toLowerCase().indexOf(q) !== -1;
       });
     }
@@ -1807,10 +1882,10 @@ h1,h2,h3,p{ margin:0; }
           MONTHS[m.month] + '</button>';
       }).join('');
 
-    var accChips = '<button class="chip' + (S.tx.account === 'all' ? ' chip--on' : '') + '" data-action="a" data-id="all">All accounts</button>' +
-      DB.ACCOUNTS.map(function (a) {
-        return '<button class="chip' + (S.tx.account === a.id ? ' chip--on' : '') + '" data-action="a" data-id="' + a.id + '">' +
-          esc(a.name) + '</button>';
+    var accChips = '<button class="chip' + (S.tx.card === 'all' ? ' chip--on' : '') + '" data-action="a" data-id="all">All cards</button>' +
+      DB.CARDS.map(function (c) {
+        return '<button class="chip' + (S.tx.card === c.last4 ? ' chip--on' : '') + '" data-action="a" data-id="' + c.last4 + '">' +
+          '***' + c.last4 + '</button>';
       }).join('');
 
     return '<div class="searchbar"><div class="search">' + icon('search') +
@@ -1835,16 +1910,17 @@ h1,h2,h3,p{ margin:0; }
     if (!t) return;
     var a = DB.account(t.accountId), c = cat(t.category);
     var rows = [
-      ['Account', a.name + ' · ' + a.last4],
+      ['Account', a.number],
       ['Category', c.label],
       ['Date', dLong(t.date) + ', ' + tTime(t.date)],
-      ['Channel', t.channel],
+      ['Type', t.type],
       ['Reference', t.ref],
       ['Balance after', amountSigned(t.balanceAfter)]
     ];
-    if (t.from) rows.splice(2, 0, ['From', t.from]);
-    if (t.to) rows.splice(t.from ? 3 : 2, 0, ['To', t.to]);
-    if (t.note) rows.splice(2, 0, ['Description', t.note]);
+    if (t.card) rows.splice(1, 0, ['Card', '***' + t.card]);
+    if (t.from) rows.splice(3, 0, ['From', t.from]);
+    if (t.to) rows.splice(t.from ? 4 : 3, 0, ['To', t.to]);
+    if (t.note) rows.splice(3, 0, ['Description', t.note]);
 
     openSheet(null,
       '<div style="display:flex;align-items:flex-start;gap:13px;margin-bottom:14px">' +
@@ -1865,11 +1941,11 @@ h1,h2,h3,p{ margin:0; }
 
   /* ---------------------------------------------------------------- 9. Screen: cards */
   function renderCards() {
-    var a = DB.account('ac-everyday'), c = DB.account('ac-credit');
+    var a = DB.ACCOUNTS[0];
     return '<div class="cards-hero">' + plastic(a, true) +
         '<div style="text-align:center">' +
-          '<div class="t-section">' + esc(a.name) + '</div>' +
-          '<div class="t-cap">' + esc(a.pan) + ' · ' + (S.frozen ? 'Frozen' : 'Active') + '</div>' +
+          '<div class="t-section">' + esc(DB.CARDS[0].name) + '</div>' +
+          '<div class="t-cap">' + esc(DB.CARDS[0].pan) + ' · ' + (S.frozen ? 'Frozen' : 'Active') + '</div>' +
         '</div></div>' +
       '<div class="actions">' +
         '<button class="action" data-action="freeze"><span class="action__ic">' + icon('lock') + '</span><span>' + (S.frozen ? 'Unfreeze' : 'Freeze') + '</span></button>' +
@@ -1878,8 +1954,13 @@ h1,h2,h3,p{ margin:0; }
         '<button class="action" data-action="soon"><span class="action__ic">' + icon('bell') + '</span><span>Alerts</span></button>' +
       '</div>' +
       '<div class="group" style="margin-top:12px"><div class="group__head">All cards</div>' +
-        row({ icon: 'cards', label: a.name, sub: 'Debit · ' + a.last4, meta: '<span class="num">' + money(a.available) + '</span>', action: 'account', id: a.id }) +
-        row({ icon: 'cards', label: c.name, sub: 'Credit · ' + c.last4, meta: '<span class="num">' + money(c.available) + '</span>', action: 'account', id: c.id }) +
+        DB.CARDS.map(function (c) {
+          return row({
+            icon: 'cards', label: c.name, sub: c.kind + ' · ' + c.pan,
+            meta: '<span class="num">' + money(a.available) + '</span>',
+            action: 'card', id: c.last4
+          });
+        }).join('') +
       '</div>' +
       '<div class="group"><div class="group__head">Security</div>' +
         row({ icon: 'lock', label: 'Change PIN', action: 'soon' }) +
@@ -1894,10 +1975,10 @@ h1,h2,h3,p{ margin:0; }
         row({ icon: 'travel', label: 'Travel', action: 'soon' }) +
         row({ icon: 'payshap', label: 'PayShap', action: 'soon' }) +
       '</div>' +
-      '<div class="group"><div class="group__head">Meridian Pay</div>' +
+      '<div class="group"><div class="group__head">Discovery Pay</div>' +
         row({ icon: 'seal', label: 'Contact Payments', action: 'soon' }) +
         row({ icon: 'heart', label: 'Health Pay', action: 'soon' }) +
-        row({ icon: 'tick', label: 'Momentum Pay', action: 'soon' }) +
+        row({ icon: 'tick', label: 'Vitality Pay', action: 'soon' }) +
       '</div>' +
       '<div class="group"><div class="group__head">Document repository</div>' +
         row({ icon: 'doc', label: 'Statements', sub: 'Order and request history', action: 'statements' }) +
@@ -2105,7 +2186,7 @@ h1,h2,h3,p{ margin:0; }
         (asc.length ? asc.map(function (t) {
           return '<tr><td class="num">' + dNum(t.date) + '</td>' +
             '<td>' + esc(t.merchant) + '<br><span style="color:var(--ink-3)">' +
-              esc(cat(t.category).label) + ' · ' + esc(t.channel) + ' · ' + esc(t.ref) + '</span></td>' +
+              esc(t.type) + (t.card ? ' ***' + esc(t.card) : '') + ' · ' + esc(cat(t.category).label) + ' · ' + esc(t.ref) + '</span></td>' +
             '<td class="r num">' + amountSigned(t.amount) + '</td>' +
             '<td class="r num">' + amountSigned(t.balanceAfter) + '</td></tr>';
         }).join('') : '<tr><td colspan="4" style="padding:16px 22px;color:var(--ink-3)">No transactions for this period</td></tr>') +
@@ -2148,7 +2229,7 @@ h1,h2,h3,p{ margin:0; }
     login:      { chrome: false, title: 'Log in', render: renderLogin, flush: true },
     home:       { tab: 'home', appbar: homeAppbar, render: renderHome },
     accounts:   { tab: 'accounts', title: 'Accounts', render: renderAccounts },
-    account:    { tab: 'accounts', title: function (p) { var a = DB.account(p.id); return a ? a.name : 'Account'; }, back: true, render: renderAccount },
+    account:    { tab: 'accounts', title: function (p) { var a = DB.account(p.id); return a ? (a.shortName || a.name) : 'Account'; }, back: true, render: renderAccount },
     transact:   { tab: 'transact', title: 'Transaction history', render: renderTransact },
     cards:      { tab: 'cards', title: 'Cards', render: renderCards },
     more:       { tab: 'more', title: 'More', render: renderMore, flush: true },
@@ -2334,7 +2415,6 @@ h1,h2,h3,p{ margin:0; }
     },
     'order-current': function () {
       S.order = defaultOrder();
-      if (S.tx.account !== 'all') S.order.accountId = S.tx.account;
       if (S.tx.month !== 'all') {
         var p = S.tx.month.split('-');
         S.order.period = 'custom';
@@ -2343,8 +2423,8 @@ h1,h2,h3,p{ margin:0; }
       }
       go('order', {}, 'push');
     },
-    'history-for': function (el) {
-      S.tx.account = el.dataset.id;
+    'history-for': function () {
+      S.tx.card = 'all';
       S.tx.month = 'all';
       S.tx.q = '';
       go('transact', {}, 'fade');
@@ -2397,19 +2477,34 @@ h1,h2,h3,p{ margin:0; }
         '<button class="btn btn--primary btn--wide" style="margin-top:16px" data-action="copy">Copy details</button>');
     },
     copy: function () { closeSheet(); toast('Account details copied'); },
+    card: function (el) {
+      var c = DB.CARDS.filter(function (x) { return x.last4 === el.dataset.id; })[0];
+      if (!c) return;
+      var used = DB.TX.filter(function (t) { return t.card === c.last4; });
+      openSheet(c.name,
+        '<div class="kvlist" style="padding:0">' +
+        [['Card number', c.pan],
+         ['Card type', c.kind],
+         ['Linked account', DB.ACCOUNTS[0].number],
+         ['Status', S.frozen ? 'Frozen' : 'Active'],
+         ['Transactions', String(used.length)]].map(function (r) {
+          return '<div class="kv"><span class="kv__k">' + r[0] + '</span><span class="kv__v num">' + esc(r[1]) + '</span></div>';
+        }).join('') + '</div>' +
+        '<button class="btn btn--ghost btn--wide" style="margin-top:16px" data-action="soon">Card settings</button>');
+    },
 
     /* — history — */
     tx: function (el) { openTx(el.dataset.id); },
     proof: function () { closeSheet(); toast('Proof of payment sent by email'); },
     m: function (el) { S.tx.month = el.dataset.id; repaint(); },
-    a: function (el) { S.tx.account = el.dataset.id; repaint(); },
+    a: function (el) { S.tx.card = el.dataset.id; repaint(); },
     'filter-sheet': function () {
       openSheet('Filters',
-        '<p class="t-cap" style="margin-bottom:12px">Clear the month, account and search term.</p>' +
+        '<p class="t-cap" style="margin-bottom:12px">Clear the month, card and search term.</p>' +
         '<button class="btn btn--ghost btn--wide" data-action="filter-reset">Reset filters</button>');
     },
     'filter-reset': function () {
-      S.tx = { q: '', month: 'all', account: 'all' };
+      S.tx = { q: '', month: 'all', card: 'all' };
       closeSheet();
       repaint();
       toast('Filters cleared');
