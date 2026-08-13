@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ПРОДУКТ — вайрфреймы</title>
+<link rel="stylesheet" href="board.css">
+</head>
+<body>
+
+<h1>ПРОДУКТ — вайрфреймы</h1>
+<p class="sub">Одна фраза: что за продукт и что показывают эти каркасы. Дальше паттерн-референсы: откуда взята анатомия карточки, откуда сетка, откуда визард. Закрывающая фраза обязательна: это структура, не визуальный стиль.</p>
+
+<div class="princ">
+  <span>Принцип продукта, который видно в каркасах</span>
+  <span>Второй принцип</span>
+  <span>Третий принцип</span>
+</div>
+
+<div class="legend">
+  <div><span class="dot" style="background:var(--f1)">1</span> Поток 1: название</div>
+  <div><span class="dot" style="background:var(--f2)">2</span> Поток 2: название</div>
+  <div><span class="dot" style="background:var(--f3)">3</span> Поток 3: название</div>
+  <div><span class="dot" style="background:var(--f4)">4</span> Поток 4: название</div>
+</div>
+
+<div class="map">
+  <span class="node"><b>Вход</b>: откуда приходят</span>
+  <span class="arr">→</span>
+  <span class="node"><b>Продукт</b></span>
+  <span class="tabs">
+    <span class="tab">Таб 1</span><span class="tab">Таб 2</span><span class="tab">Таб 3</span><span class="tab">Таб 4</span>
+  </span>
+  <span class="arr">→</span>
+  <span class="node"><b>Выход</b>: чем заканчивается</span>
+</div>
+
+<!-- ── СЕКЦИЯ = ОДИН ПОТОК ИЛИ ОДИН ТАБ ───────────────────────── -->
+<section>
+  <h2>Название секции (таб 1, главный экран)</h2>
+  <p>Одно предложение: зачем этот кусок продукта и что здесь решает пользователь.</p>
+
+  <div class="row">
+
+    <!-- ПАТТЕРН A: обычный экран со стеком блоков -->
+    <div class="cell">
+      <div class="phone">
+        <div class="flows"><span class="dot" style="background:var(--f1)">1</span></div>
+        <div class="stack">
+          <div class="bar" style="width:60%"></div>
+          <div class="txt"></div>
+          <div class="txt" style="width:80%"></div>
+          <div class="field">Плейсхолдер поля</div>
+          <div class="stack" style="flex-direction:row; gap:6px; flex-wrap:wrap">
+            <span class="chip on">Выбрано</span><span class="chip">Вариант</span><span class="chip">Вариант</span>
+          </div>
+          <div class="btn pr">Основное действие</div>
+          <div class="btn ghost">Второе действие</div>
+        </div>
+        <div class="tabbar">
+          <div class="on"><span class="ic"></span>Таб 1</div>
+          <div><span class="ic"></span>Таб 2</div>
+          <div><span class="ic"></span>Таб 3<span class="badge"></span></div>
+          <div><span class="ic"></span>Таб 4</div>
+        </div>
+      </div>
+      <div class="cap"><div class="t">A1. Код и название экрана</div><div class="d">Что здесь происходит и что важно в структуре. Одно-два предложения.</div></div>
+    </div>
+
+    <!-- ПАТТЕРН B: full-bleed медиа с градиентом и действиями -->
+    <div class="cell">
+      <div class="phone nopad">
+        <div class="flows"><span class="dot" style="background:var(--f1)">1</span></div>
+        <div style="position:relative; flex:1; overflow:hidden">
+          <div class="work"><span class="wlabel">что за медиа лежит во весь экран</span></div>
+          <div class="segs"><i class="on"></i><i></i><i></i></div>
+          <div class="tapzone" style="left:0"></div>
+          <div class="tapzone" style="right:0"></div>
+          <div class="grad">
+            <div style="display:flex; align-items:center; gap:8px">
+              <div class="avatar" style="width:30px;height:30px; border-color:rgba(255,255,255,.6)"></div>
+              <div>
+                <div class="name">Имя</div>
+                <div class="meta">Роль · Город</div>
+              </div>
+            </div>
+            <span class="wchip">Ключевой атрибут</span>
+            <div class="meta" style="margin-top:8px">подсказка про жест ↑</div>
+          </div>
+          <div class="actions">
+            <div class="fab">✕</div>
+            <div class="fab dark">♥</div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="on"><span class="ic"></span>Таб 1</div>
+          <div><span class="ic"></span>Таб 2</div>
+          <div><span class="ic"></span>Таб 3</div>
+          <div><span class="ic"></span>Таб 4</div>
+        </div>
+      </div>
+      <div class="cap"><div class="t">A2. Карточка</div><div class="d">Анатомия карточки: что во весь экран, что на градиенте, какие действия и жесты.</div></div>
+    </div>
+
+    <!-- ПАТТЕРН C: оверлей поверх экрана -->
+    <div class="cell">
+      <div class="phone nopad">
+        <div class="flows"><span class="dot" style="background:var(--f2)">2</span></div>
+        <div style="position:relative; flex:1; overflow:hidden">
+          <div class="work"></div>
+          <div class="overlay">
+            <div class="modal">
+              <div class="duo"><div class="avatar"></div><div class="avatar"></div></div>
+              <div style="font-weight:700; font-size:15px">Заголовок момента</div>
+              <div class="note" style="margin:6px 0 12px">Что произошло и что делать дальше</div>
+              <div class="btn pr">Главное действие</div>
+              <div class="btn ghost" style="margin-top:6px">Позже</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><div class="t">A3. Оверлей</div><div class="d">Момент-событие поверх любого экрана. Закрывается только явным действием.</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── ЛОГИКА, КОТОРУЮ НЕ ВИДНО НА ЭКРАНАХ ────────────────────── -->
+<section>
+  <h2>Логика, которую не видно на каркасах</h2>
+  <p>Правила подмешивания, приоритеты выдачи, пустые состояния, лимиты. Текстом, без экранов.</p>
+</section>
+
+</body>
+</html>
