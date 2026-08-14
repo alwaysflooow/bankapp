@@ -605,10 +605,8 @@
         'The <b>Discovery Bank</b> icon appears on the Home screen and in the app list.',
         'Open it from the icon — the app runs full screen and remembers you between sessions.',
         'To remove it later, press and hold the icon → <b>Remove</b>.'
-      ]) + '<p class="guide__note">On an iPhone it works the same way: <b>Safari → Share → Add to Home Screen</b>, ' +
-        'and the name field there is editable too — make sure it says <b>Discovery Bank</b> before you tap <b>Add</b>.<br><br>' +
-        'If Chrome offers <b>Add shortcut</b> instead of <b>Install</b>, reload the page and try again — ' +
-        'the shortcut is just a bookmark and opens with the address bar.</p>') +
+      ]) + '<p class="guide__note">If Chrome offers <b>Add shortcut</b> instead of <b>Install</b>, ' +
+        'reload the page and try again — the shortcut is just a bookmark and opens with the address bar.</p>') +
 
       sec(2, 'Log in and log out', ol([
         'Tap the <b>Discovery Bank</b> icon on your Home screen.',
@@ -673,6 +671,10 @@
         'Choose the <b>Format</b> (PDF or CSV) and <b>Delivery</b>: <b>In the app</b> is the default.',
         'Tap <b>Order statement</b>. The request appears as <b>Processing</b> and turns into <b>Ready</b> in a moment.',
         'Tap the ready request — the statement opens.',
+        'To read the statement across the full width of the screen, <b>turn the phone sideways</b>. ' +
+          'The table then fits completely and you do not have to scroll it.',
+        'If nothing rotates, swipe down from the top of the screen to open <b>Quick settings</b> and tap the ' +
+          'rotation button until it says <b>Auto rotate</b> instead of <b>Portrait</b>. Turn the phone again.',
         '<b>Print / PDF</b> opens the Android print dialog: choose <b>Save as PDF</b> and the file lands in <b>Downloads</b>.',
         '<b>Email</b> opens your mail app with the statement summary already filled in. Attach the PDF you saved if you need the document itself.'
       ])) +

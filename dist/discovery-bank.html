@@ -152,10 +152,14 @@ h1,h2,h3,p{ margin:0; }
   overflow:hidden;
 }
 
-@media (max-width:559px){
+/* Узкий экран или низкий (телефон, повёрнутый набок) — рамка убирается,
+   приложение занимает весь экран. В альбомной ориентации таблица выписки
+   помещается целиком, без прокрутки вбок. */
+@media (max-width:559px), (max-height:559px){
   .stage{ padding:0; gap:0; min-height:100dvh; }
-  .device{ max-width:none; height:100dvh; border-radius:0; box-shadow:none; }
+  .device{ max-width:none; width:100%; height:100dvh; border-radius:0; box-shadow:none; }
   .stage__hint{ display:none; }
+  .statusbar{ display:none; }
 }
 
 /* Запущено с домашнего экрана: рамка телефона не нужна, статус-бар рисует
@@ -174,7 +178,7 @@ h1,h2,h3,p{ margin:0; }
    рисуется: там уже есть системный, и второй ряд времени/сети/батареи
    выглядел бы дублем. */
 .statusbar{ display:none; }
-@media (min-width:560px){
+@media (min-width:560px) and (min-height:560px){
   .statusbar{
     flex:0 0 auto;
     height:34px; padding:0 18px 0 20px;
@@ -870,6 +874,13 @@ h1,h2,h3,p{ margin:0; }
 .sheet__grip{ width:38px; height:4px; border-radius:var(--r-round); background:var(--line-2); margin:0 auto 10px; }
 .sheet__title{ padding:2px 20px 10px; font-size:18px; font-weight:620; letter-spacing:-.2px; }
 .sheet__body{ padding:0 20px 6px; }
+
+/* В альбомной ориентации высота дорога — панель кнопок под документом
+   становится компактнее, документу остаётся больше места. */
+@media (max-height:559px){
+  .docbar{ padding:8px 16px; }
+  .docbar .btn{ height:42px; }
+}
 
 /* ---------- 22b. Приватный экран ----------------------------------------- */
 /* Пока приложение свёрнуто, суммы не видны — ни на экране, ни в списке
@@ -2189,10 +2200,8 @@ h1,h2,h3,p{ margin:0; }
         'The <b>Discovery Bank</b> icon appears on the Home screen and in the app list.',
         'Open it from the icon — the app runs full screen and remembers you between sessions.',
         'To remove it later, press and hold the icon → <b>Remove</b>.'
-      ]) + '<p class="guide__note">On an iPhone it works the same way: <b>Safari → Share → Add to Home Screen</b>, ' +
-        'and the name field there is editable too — make sure it says <b>Discovery Bank</b> before you tap <b>Add</b>.<br><br>' +
-        'If Chrome offers <b>Add shortcut</b> instead of <b>Install</b>, reload the page and try again — ' +
-        'the shortcut is just a bookmark and opens with the address bar.</p>') +
+      ]) + '<p class="guide__note">If Chrome offers <b>Add shortcut</b> instead of <b>Install</b>, ' +
+        'reload the page and try again — the shortcut is just a bookmark and opens with the address bar.</p>') +
 
       sec(2, 'Log in and log out', ol([
         'Tap the <b>Discovery Bank</b> icon on your Home screen.',
@@ -2257,6 +2266,10 @@ h1,h2,h3,p{ margin:0; }
         'Choose the <b>Format</b> (PDF or CSV) and <b>Delivery</b>: <b>In the app</b> is the default.',
         'Tap <b>Order statement</b>. The request appears as <b>Processing</b> and turns into <b>Ready</b> in a moment.',
         'Tap the ready request — the statement opens.',
+        'To read the statement across the full width of the screen, <b>turn the phone sideways</b>. ' +
+          'The table then fits completely and you do not have to scroll it.',
+        'If nothing rotates, swipe down from the top of the screen to open <b>Quick settings</b> and tap the ' +
+          'rotation button until it says <b>Auto rotate</b> instead of <b>Portrait</b>. Turn the phone again.',
         '<b>Print / PDF</b> opens the Android print dialog: choose <b>Save as PDF</b> and the file lands in <b>Downloads</b>.',
         '<b>Email</b> opens your mail app with the statement summary already filled in. Attach the PDF you saved if you need the document itself.'
       ])) +
