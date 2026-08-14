@@ -599,11 +599,16 @@
         'Open the app link in <b>Chrome</b> (or Samsung Internet).',
         'In Chrome tap <b>⋮</b> in the top right corner → <b>Add to Home screen</b> → <b>Install</b>, then confirm.',
         'In Samsung Internet tap <b>☰</b> in the bottom right corner → <b>Add page to</b> → <b>Home screen</b> → <b>Add</b>.',
+        '<b>Before you confirm, check the name in the dialog: it has to read Discovery Bank.</b> ' +
+          'If it shows anything shorter, tap the name field and type it in yourself — the name is saved ' +
+          'at the moment the shortcut is created and does not update later.',
         'The <b>Discovery Bank</b> icon appears on the Home screen and in the app list.',
         'Open it from the icon — the app runs full screen and remembers you between sessions.',
         'To remove it later, press and hold the icon → <b>Remove</b>.'
-      ]) + '<p class="guide__note">If Chrome offers <b>Add shortcut</b> instead of <b>Install</b>, ' +
-        'reload the page and try again — the shortcut is just a bookmark and opens with the address bar.</p>') +
+      ]) + '<p class="guide__note">On an iPhone it works the same way: <b>Safari → Share → Add to Home Screen</b>, ' +
+        'and the name field there is editable too — make sure it says <b>Discovery Bank</b> before you tap <b>Add</b>.<br><br>' +
+        'If Chrome offers <b>Add shortcut</b> instead of <b>Install</b>, reload the page and try again — ' +
+        'the shortcut is just a bookmark and opens with the address bar.</p>') +
 
       sec(2, 'Log in and log out', ol([
         'Tap the <b>Discovery Bank</b> icon on your Home screen.',
