@@ -1,6 +1,6 @@
 {
   "name": "Discovery Bank",
-  "short_name": "Discovery",
+  "short_name": "Discovery Bank",
   "description": "Mobile banking design mockup",
   "start_url": "./index.html",
   "scope": "./",

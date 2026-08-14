@@ -584,7 +584,19 @@
       'Written for a Galaxy A54 on Android 16 (One UI 8) — other Android phones work the same way, ' +
       'the settings may just be named slightly differently.</p>' +
 
-      sec(1, 'Log in and log out', ol([
+      sec(1, 'Put the app on your Home screen', 
+        '<p>The app opens in the browser, but it can live on the Home screen like any other app — ' +
+        'full screen, without the address bar.</p>' + ol([
+        'Open the app link in <b>Chrome</b> (or Samsung Internet).',
+        'In Chrome tap <b>⋮</b> in the top right corner → <b>Add to Home screen</b> → <b>Install</b>, then confirm.',
+        'In Samsung Internet tap <b>☰</b> in the bottom right corner → <b>Add page to</b> → <b>Home screen</b> → <b>Add</b>.',
+        'The <b>Discovery Bank</b> icon appears on the Home screen and in the app list.',
+        'Open it from the icon — the app runs full screen and remembers you between sessions.',
+        'To remove it later, press and hold the icon → <b>Remove</b>.'
+      ]) + '<p class="guide__note">If Chrome offers <b>Add shortcut</b> instead of <b>Install</b>, ' +
+        'reload the page and try again — the shortcut is just a bookmark and opens with the address bar.</p>') +
+
+      sec(2, 'Log in and log out', ol([
         'Tap the <b>Discovery Bank</b> icon on your Home screen.',
         'In <b>Username</b> type your mobile number: <b>+27 66 258 2832</b>. The short form <b>0662582832</b> works too.',
         'In <b>Password</b> type your 4-digit code. The eye icon on the right shows what you typed.',
@@ -592,7 +604,7 @@
         'To leave: bottom bar → <b>More</b> → scroll down → <b>Log out</b> → confirm. Your data stays, only the session ends.'
       ]) + '<p class="guide__note">If the phone keyboard covers the buttons, swipe down on the screen to hide it.</p>') +
 
-      sec(2, 'Save your password and unlock with biometrics', 
+      sec(3, 'Save your password and unlock with biometrics', 
         '<p>The app runs on the phone\'s browser engine, so it does not ask for a fingerprint itself — ' +
         'your phone\'s password manager does that for you.</p>' + ol([
         'The first time you log in, Samsung Pass or Google offers <b>Save password</b> — tap <b>Save</b>.',
@@ -604,7 +616,7 @@
         'front camera and counts as less secure, so password managers usually accept the fingerprint only. ' +
         'Face ID is an Apple feature and does not exist on Samsung phones.</p>') +
 
-      sec(3, 'Check your balance', ol([
+      sec(4, 'Check your balance', ol([
         'Open the <b>Home</b> tab in the bottom bar.',
         'Under <b>Accounts</b> the first card is <b>Bank Portfolio</b>: <b>Total balance</b> on top, <b>Your available balance</b> below.',
         'Swipe the card to the left to see the account itself.',
@@ -612,14 +624,14 @@
         'Tap a card to open the account: balance, account number, branch code and SWIFT.'
       ])) +
 
-      sec(4, 'Look through your transactions', ol([
+      sec(5, 'Look through your transactions', ol([
         'Open the <b>Transact</b> tab. Newest operations are on top, grouped by day.',
         'The first row of chips filters by month, the second by card (<b>***2740</b> or <b>***9441</b>).',
         '<b>Money in</b> and <b>Money out</b> above the list recalculate for whatever you selected.',
         'Tap any operation to see the details: card, category, date and time, type, reference and the balance after it.'
       ])) +
 
-      sec(5, 'Find one specific transaction', 
+      sec(6, 'Find one specific transaction', 
         '<p>Example: the incoming SWIFT transfer from August.</p>' + ol([
         'Open the <b>Transact</b> tab and tap <b>Search transactions</b>.',
         'Type <b>SWIFT</b> — the list narrows down to incoming transfers.',
@@ -628,7 +640,7 @@
         'Search also accepts a reference number or a category name, for example <b>Income</b>.'
       ]) + '<p class="guide__note">If you know the month, tap its chip first — the list gets shorter and the search is faster.</p>') +
 
-      sec(6, 'Create a statement', ol([
+      sec(7, 'Create a statement', ol([
         'Open <b>More → Statements</b>. The same screen is one tap away from <b>Home → Statement</b>.',
         'Tap <b>Order a statement</b>.',
         '<b>Period</b>: <b>Last month</b>, <b>3 months</b> (three full calendar months) or <b>Custom</b>.',
