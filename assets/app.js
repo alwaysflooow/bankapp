@@ -38,7 +38,7 @@
       to: null,
       incl: { details: true, tx: true, cats: true },
       format: 'pdf',
-      delivery: 'email'
+      delivery: 'app'
     };
   }
 
@@ -560,8 +560,88 @@
         row({ icon: 'bell', label: 'Notifications', action: 'soon' }) +
         row({ icon: 'user', label: 'Profile and details', action: 'profile' }) +
       '</div>' +
+      '<div class="group"><div class="group__head">Help</div>' +
+        row({ icon: 'info', label: 'How to use this app', sub: 'Step-by-step guide for first-time users', action: 'guide' }) +
+      '</div>' +
       '<div style="position:sticky;bottom:0;padding:14px 20px 16px;background:linear-gradient(180deg,rgba(255,255,255,0),var(--surface) 34%)">' +
         '<button class="btn btn--primary btn--wide" data-action="logout">Log out</button></div>';
+  }
+
+  /* ---------------------------------------------------------------- 10b. Screen: guide */
+  /* Инструкция для первого запуска. Пути к настройкам — для Galaxy A54
+     на Android 16 (One UI 8); формулировки в других сборках могут
+     отличаться на слово, но разделы называются так же. */
+  function renderGuide() {
+    function sec(n, title, html) {
+      return '<section class="guide__sec">' +
+        '<div class="guide__h"><span class="guide__n">' + n + '</span>' +
+        '<h3>' + title + '</h3></div>' + html + '</section>';
+    }
+    function ol(items) { return '<ol>' + items.map(function (i) { return '<li>' + i + '</li>'; }).join('') + '</ol>'; }
+
+    return '<div class="guide">' +
+      '<p class="guide__lead">A short walkthrough for your first time in the app. ' +
+      'Written for a Galaxy A54 on Android 16 (One UI 8) — other Android phones work the same way, ' +
+      'the settings may just be named slightly differently.</p>' +
+
+      sec(1, 'Log in and log out', ol([
+        'Tap the <b>Discovery Bank</b> icon on your Home screen.',
+        'In <b>Username</b> type your mobile number: <b>+27 66 258 2832</b>. The short form <b>0662582832</b> works too.',
+        'In <b>Password</b> type your 4-digit code. The eye icon on the right shows what you typed.',
+        'Tap <b>Log in</b>. You are greeted by name and the Home screen opens.',
+        'To leave: bottom bar → <b>More</b> → scroll down → <b>Log out</b> → confirm. Your data stays, only the session ends.'
+      ]) + '<p class="guide__note">If the phone keyboard covers the buttons, swipe down on the screen to hide it.</p>') +
+
+      sec(2, 'Save your password and unlock with biometrics', 
+        '<p>The app runs on the phone\'s browser engine, so it does not ask for a fingerprint itself — ' +
+        'your phone\'s password manager does that for you.</p>' + ol([
+        'The first time you log in, Samsung Pass or Google offers <b>Save password</b> — tap <b>Save</b>.',
+        'Next time, tap the <b>Username</b> field. A suggestion bar appears above the keyboard — tap your saved entry.',
+        'The phone asks you to confirm: put your finger on the fingerprint sensor in the lower part of the screen. Both fields fill in.',
+        'To choose which manager fills passwords: <b>Settings → General management → Passwords, passkeys and autofill → Autofill service</b>.',
+        'To check that biometrics are set up: <b>Settings → Security and privacy → Biometrics</b>.'
+      ]) + '<p class="guide__note">The A54 has a fingerprint sensor and face recognition. Face recognition on this model uses the ' +
+        'front camera and counts as less secure, so password managers usually accept the fingerprint only. ' +
+        'Face ID is an Apple feature and does not exist on Samsung phones.</p>') +
+
+      sec(3, 'Check your balance', ol([
+        'Open the <b>Home</b> tab in the bottom bar.',
+        'Under <b>Accounts</b> the first card is <b>Bank Portfolio</b>: <b>Total balance</b> on top, <b>Your available balance</b> below.',
+        'Swipe the card to the left to see the account itself.',
+        'The eye icon next to the word <b>Accounts</b> hides and shows all amounts — handy in public.',
+        'Tap a card to open the account: balance, account number, branch code and SWIFT.'
+      ])) +
+
+      sec(4, 'Look through your transactions', ol([
+        'Open the <b>Transact</b> tab. Newest operations are on top, grouped by day.',
+        'The first row of chips filters by month, the second by card (<b>***2740</b> or <b>***9441</b>).',
+        '<b>Money in</b> and <b>Money out</b> above the list recalculate for whatever you selected.',
+        'Tap any operation to see the details: card, category, date and time, type, reference and the balance after it.'
+      ])) +
+
+      sec(5, 'Find one specific transaction', 
+        '<p>Example: the incoming SWIFT transfer from August.</p>' + ol([
+        'Open the <b>Transact</b> tab and tap <b>Search transactions</b>.',
+        'Type <b>SWIFT</b> — the list narrows down to incoming transfers.',
+        'Find <b>Inward SWIFT RO26Kt3Vd80 Wise Payments</b>, 13 August 2026, <b>R 28,717.18</b>.',
+        'Tap it: the card shows <b>From: Wise Payments</b>, <b>To: 14902470882</b>, the reference number and the balance after the transfer.',
+        'Search also accepts a reference number or a category name, for example <b>Income</b>.'
+      ]) + '<p class="guide__note">If you know the month, tap its chip first — the list gets shorter and the search is faster.</p>') +
+
+      sec(6, 'Create a statement', ol([
+        'Open <b>More → Statements</b>. The same screen is one tap away from <b>Home → Statement</b>.',
+        'Tap <b>Order a statement</b>.',
+        '<b>Period</b>: <b>Last month</b>, <b>3 months</b> (three full calendar months) or <b>Custom</b>.',
+        'For <b>Custom</b> tap <b>From</b>, pick a day in the calendar, then tap <b>To</b> and pick the closing day.',
+        'Under <b>What to include</b> keep account details, transaction history and the category summary — or switch off what you do not need.',
+        'Choose the <b>Format</b> (PDF or CSV) and <b>Delivery</b>: <b>In the app</b> is the default.',
+        'Tap <b>Order statement</b>. The request appears as <b>Processing</b> and turns into <b>Ready</b> in a moment.',
+        'Tap the ready request — the statement opens.',
+        '<b>Print / PDF</b> opens the Android print dialog: choose <b>Save as PDF</b> and the file lands in <b>Downloads</b>.',
+        '<b>Email</b> opens your mail app with the statement summary already filled in. Attach the PDF you saved if you need the document itself.'
+      ])) +
+
+    '</div>';
   }
 
   /* ---------------------------------------------------------------- 11. Statements */
@@ -572,17 +652,24 @@
       return { from: monthStart(m.getFullYear(), m.getMonth()), to: monthEnd(m.getFullYear(), m.getMonth()) };
     }
     if (o.period === '3m') {
-      var s = new Date(t.getFullYear(), t.getMonth() - 2, 1);
-      return { from: monthStart(s.getFullYear(), s.getMonth()), to: t };
+      // именно три полных месяца, текущий неполный не берём
+      var s = new Date(t.getFullYear(), t.getMonth() - 3, 1);
+      var e = new Date(t.getFullYear(), t.getMonth() - 1, 1);
+      return { from: monthStart(s.getFullYear(), s.getMonth()), to: monthEnd(e.getFullYear(), e.getMonth()) };
     }
     var f = o.from || monthStart(t.getFullYear(), t.getMonth());
     var e = o.to || t;
-    return { from: f, to: e > t ? t : e };
+    // конец дня, чтобы операции последней даты попали в выписку
+    e = new Date(e.getFullYear(), e.getMonth(), e.getDate(), 23, 59, 59);
+    return { from: new Date(f.getFullYear(), f.getMonth(), f.getDate()), to: e > t ? t : e };
   }
 
   function periodLabel(o) {
     var p = periodOf(o);
     if (o.period === '1m') return MONTHS[p.from.getMonth()] + ' ' + p.from.getFullYear();
+    if (o.period === '3m') {
+      return MONTHS[p.from.getMonth()] + ' — ' + MONTHS[p.to.getMonth()] + ' ' + p.to.getFullYear();
+    }
     return dShort(p.from) + ' — ' + dShort(p.to) + ' ' + p.to.getFullYear();
   }
 
@@ -818,15 +905,116 @@
       '<div class="st__foot">' +
         '<div>' + esc(DB.BANK.address) + ' | ' + esc(DB.BANK.support) + '</div>' +
         '<p>' + esc(DB.BANK.legalLine) + '</p>' +
-        '<span class="st__seal">' + icon('markSolid') + '</span>' +
+        '<span class="st__seal"><img src="assets/brand/logo-seal.png" alt=""></span>' +
       '</div>';
 
     var bar = '<div class="docbar">' +
-      '<button class="btn btn--ghost" data-action="send-doc" data-id="' + r.id + '">' + icon('share') + 'Email</button>' +
+      '<a class="btn btn--ghost" id="doc-mail" href="' + esc(mailtoFor(r)) + '">' + icon('share') + 'Email</a>' +
       '<button class="btn btn--primary" data-action="print">' + icon('print') + 'Print / PDF</button>' +
     '</div>';
 
     return '<div class="st">' + head + summary + table + catBlock + holders + foot + '</div>' + bar;
+  }
+
+  /* ---------------------------------------------------------------- 12b. Календарь и почта */
+
+  /* Выбор дат выписки: месячная сетка с ограничением по доступному периоду.
+     from не может быть позже to, обе даты лежат внутри истории счёта. */
+  var CAL = { which: 'from', view: null };
+  var WD = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  function sameDate(a, b) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+  function dayStart(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+  function calBounds() {
+    var p = periodOf(S.order);
+    return CAL.which === 'from'
+      ? { min: dayStart(DB.PERIOD_START), max: dayStart(p.to) }
+      : { min: dayStart(p.from), max: dayStart(DB.TODAY) };
+  }
+
+  function calendarHtml() {
+    var b = calBounds();
+    var v = CAL.view;
+    var y = v.getFullYear(), m = v.getMonth();
+    var first = new Date(y, m, 1);
+    var lead = (first.getDay() + 6) % 7;              // неделя начинается с понедельника
+    var days = new Date(y, m + 1, 0).getDate();
+    var current = CAL.which === 'from' ? periodOf(S.order).from : periodOf(S.order).to;
+
+    var prevOk = new Date(y, m, 0) >= b.min;
+    var nextOk = new Date(y, m + 1, 1) <= b.max;
+
+    var cells = '';
+    for (var i = 0; i < lead; i++) cells += '<span class="cal__cell"></span>';
+    for (var d = 1; d <= days; d++) {
+      var date = new Date(y, m, d);
+      var off = date < b.min || date > b.max;
+      var on = sameDate(date, dayStart(current));
+      cells += '<button class="cal__cell cal__day' + (on ? ' cal__day--on' : '') + '"' +
+        (off ? ' disabled' : ' data-action="cal-pick" data-id="' + y + '-' + m + '-' + d + '"') +
+        '>' + d + '</button>';
+    }
+
+    return '<div class="cal">' +
+      '<div class="cal__head">' +
+        '<button class="cal__nav"' + (prevOk ? ' data-action="cal-prev"' : ' disabled') + '>' + icon('chevronL', { w: 2 }) + '</button>' +
+        '<span class="cal__title">' + MONTHS[m] + ' ' + y + '</span>' +
+        '<button class="cal__nav"' + (nextOk ? ' data-action="cal-next"' : ' disabled') + '>' + icon('chevron', { w: 2 }) + '</button>' +
+      '</div>' +
+      '<div class="cal__grid cal__grid--wd">' + WD.map(function (w) {
+        return '<span class="cal__wd">' + w + '</span>';
+      }).join('') + '</div>' +
+      '<div class="cal__grid">' + cells + '</div>' +
+      '<p class="cal__hint">Available history: ' + dPlain(DB.PERIOD_START) + ' — ' + dPlain(DB.TODAY) + '</p>' +
+    '</div>';
+  }
+
+  function openCalendar(which) {
+    CAL.which = which;
+    var p = periodOf(S.order);
+    var cur = which === 'from' ? p.from : p.to;
+    CAL.view = new Date(cur.getFullYear(), cur.getMonth(), 1);
+    openSheet(which === 'from' ? 'Statement start date' : 'Statement end date', calendarHtml());
+  }
+
+  function calShift(step) {
+    CAL.view = new Date(CAL.view.getFullYear(), CAL.view.getMonth() + step, 1);
+    var body = sheetEl.querySelector('.sheet__body');
+    if (body) body.innerHTML = calendarHtml();
+  }
+
+  /* Письмо с выпиской: ссылка mailto отдаётся системе как есть, поэтому на
+     телефоне открывается обычный выбор почтового приложения. */
+  function mailtoFor(r) {
+    var a = DB.ACCOUNTS[0];
+    var list = DB.txFor(null, r.from, r.to);
+    var tot = DB.totals(list);
+    var open = DB.openingBalanceAt(a.id, r.from);
+    var asc = list.slice().reverse();
+    var close = asc.length ? asc[asc.length - 1].balanceAfter : open;
+
+    var subject = DB.BANK.name + ' statement ' + r.ref;
+    var body = [
+      DB.BANK.name + ' — ' + a.name,
+      'Account ' + a.number,
+      'Statement ' + r.ref,
+      'Period: ' + dPlain(r.from) + ' - ' + dPlain(r.to),
+      '',
+      'Opening balance: ' + docAmt(open),
+      'Money in: ' + docAmt(tot.in),
+      'Money out: ' + docAmt(-tot.out),
+      'Closing balance: ' + docAmt(close),
+      'Transactions: ' + list.length,
+      '',
+      'Generated in the ' + DB.BANK.name + ' app on ' + dPlain(DB.TODAY) + '.'
+    ].join('\n');
+
+    return 'mailto:' + encodeURIComponent(DB.USER.email) +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(body);
   }
 
   /* ---------------------------------------------------------------- 13. Screen registry */
@@ -840,6 +1028,7 @@
     more:       { tab: 'more', title: 'More', render: renderMore, flush: true },
     statements: { tab: 'more', title: 'Statements', back: true, render: renderStatements },
     order:      { tab: 'more', title: 'Order a statement', back: true, render: renderOrder },
+    guide:      { tab: 'more', title: 'How to use this app', back: true, render: renderGuide },
     doc:        { title: 'Statement', back: true, render: renderDoc, noTabs: true, flush: true }
   };
 
@@ -970,6 +1159,10 @@
         });
       }
     }
+    if (screen === 'doc') {
+      var mail = root.querySelector('#doc-mail');
+      if (mail) mail.addEventListener('click', function () { toast('Opening your email app'); });
+    }
     if (screen === 'login') {
       var pass = root.querySelector('#f-pass'), user = root.querySelector('#f-user');
       if (pass) pass.addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
@@ -1012,6 +1205,7 @@
     back: back,
     account: function (el) { go('account', { id: el.dataset.id }, 'push'); },
     statements: function () { go('statements', {}, 'push'); },
+    guide: function () { go('guide', {}, 'push'); },
     order: function () { S.order = S.order || defaultOrder(); go('order', {}, 'push'); },
     'order-for': function (el) {
       S.order = defaultOrder();
@@ -1129,13 +1323,23 @@
       S.order.period = el.dataset.id;
       if (el.dataset.id === 'custom' && !S.order.from) {
         var t = DB.TODAY;
-        S.order.from = monthStart(t.getFullYear(), t.getMonth() - 2);
+        S.order.from = monthStart(t.getFullYear(), t.getMonth() - 1);
         S.order.to = new Date(t);
       }
       repaint();
     },
-    'pick-from': function () { monthSheet('from'); },
-    'pick-to': function () { monthSheet('to'); },
+    'pick-from': function () { openCalendar('from'); },
+    'pick-to': function () { openCalendar('to'); },
+    'cal-prev': function () { calShift(-1); },
+    'cal-next': function () { calShift(1); },
+    'cal-pick': function (el) {
+      var p = el.dataset.id.split('-');
+      var d = new Date(+p[0], +p[1], +p[2]);
+      if (CAL.which === 'from') S.order.from = d;
+      else S.order.to = new Date(+p[0], +p[1], +p[2], 23, 59, 59);
+      closeSheet();
+      repaint();
+    },
     'i-details': function () { S.order.incl.details = !S.order.incl.details; repaint(); },
     'i-tx': function () { S.order.incl.tx = !S.order.incl.tx; repaint(); },
     'i-cats': function () { S.order.incl.cats = !S.order.incl.cats; repaint(); },
@@ -1172,30 +1376,10 @@
       if (r.status !== 'ready') { toast('Your statement is still being prepared'); return; }
       go('doc', { id: r.id }, 'push');
     },
-    'send-doc': function () { toast('Statement sent to ' + DB.USER.emailMasked); },
     print: function () { window.print(); },
 
     /* — sheet — */
     'sheet-close': closeSheet
-  };
-
-  function monthSheet(which) {
-    openSheet(which === 'from' ? 'Start of period' : 'End of period',
-      DB.monthList().map(function (m) {
-        return '<button class="check" data-action="set-' + which + '" data-id="' + m.year + '-' + m.month + '">' +
-          '<span class="radio"></span><span class="picker__body"><span class="check__t">' +
-          MONTHS[m.month] + ' ' + m.year + '</span></span></button>';
-      }).join(''));
-  }
-  ACTIONS['set-from'] = function (el) {
-    var p = el.dataset.id.split('-');
-    S.order.from = monthStart(+p[0], +p[1]);
-    closeSheet(); repaint();
-  };
-  ACTIONS['set-to'] = function (el) {
-    var p = el.dataset.id.split('-');
-    S.order.to = monthEnd(+p[0], +p[1]);
-    closeSheet(); repaint();
   };
 
   /* ---------------------------------------------------------------- 17. Delegation */
