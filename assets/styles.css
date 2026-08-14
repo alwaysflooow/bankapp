@@ -869,6 +869,17 @@ h1,h2,h3,p{ margin:0; }
 .sheet__title{ padding:2px 20px 10px; font-size:18px; font-weight:620; letter-spacing:-.2px; }
 .sheet__body{ padding:0 20px 6px; }
 
+/* ---------- 22b. Приватный экран ----------------------------------------- */
+/* Пока приложение свёрнуто, суммы не видны — ни на экране, ни в списке
+   недавних приложений. */
+.privacy{
+  position:absolute; inset:0; z-index:80;
+  background:var(--surface);
+  display:grid; place-items:center;
+}
+.privacy[hidden]{ display:none; }
+.privacy img{ width:190px; height:auto; opacity:.9; }
+
 /* ---------- 23. Тост ------------------------------------------------------ */
 .toast-layer{
   position:absolute; left:0; right:0; bottom:92px; z-index:60;

@@ -17,6 +17,13 @@
      показывается в форме, счётчик до неё не блокирует кнопку. */
   var FREE_STATEMENTS = 15;
 
+  /* Автоблокировка как в банковских приложениях:
+     ушли из приложения дольше чем на LOCK_AWAY секунд — вход заново;
+     не трогали экран LOCK_IDLE секунд — сессия закрывается сама. */
+  var LOCK_AWAY = 15;
+  var LOCK_IDLE = 5 * 60;
+  var SEEN_KEY = 'discovery-mock-seen';
+
   /* ---------------------------------------------------------------- 1. State */
   var S = {
     screen: 'login',
@@ -44,6 +51,7 @@
 
   function save() {
     try {
+      if (S.authed) localStorage.setItem(SEEN_KEY, String(Date.now()));
       localStorage.setItem(STORE_KEY, JSON.stringify({
         authed: S.authed, hide: S.hide, frozen: S.frozen,
         requests: S.requests, screen: S.authed ? S.screen : 'login'
@@ -234,6 +242,7 @@
     S.authed = true;
     S.stack = [];
     save();
+    resetIdle();
     go('home', {}, 'fade');
     setTimeout(function () { toast('Welcome back, ' + DB.USER.first); }, 380);
   }
@@ -604,7 +613,17 @@
         'To leave: bottom bar → <b>More</b> → scroll down → <b>Log out</b> → confirm. Your data stays, only the session ends.'
       ]) + '<p class="guide__note">If the phone keyboard covers the buttons, swipe down on the screen to hide it.</p>') +
 
-      sec(3, 'Save your password and unlock with biometrics', 
+      sec(3, 'The app locks itself', 
+        '<p>Your money is protected even if you put the phone down or hand it to someone.</p>' + ol([
+        'Switch to another app, take a call or lock the screen for more than <b>15 seconds</b> — ' +
+          'coming back you have to log in again.',
+        'Leave the app open but do not touch it for <b>5 minutes</b> — the session closes by itself.',
+        'Close the app completely — the next start always begins with the login screen.',
+        'While the app is in the background the screen is covered, so no balances show up in the recent-apps list.'
+      ]) + '<p class="guide__note">The same happens when you jump to your email app from a statement: come back ' +
+        'and log in again. Nothing is lost — the statement is waiting in <b>More → Statements</b>.</p>') +
+
+      sec(4, 'Save your password and unlock with biometrics', 
         '<p>The app runs on the phone\'s browser engine, so it does not ask for a fingerprint itself — ' +
         'your phone\'s password manager does that for you.</p>' + ol([
         'The first time you log in, Samsung Pass or Google offers <b>Save password</b> — tap <b>Save</b>.',
@@ -616,7 +635,7 @@
         'front camera and counts as less secure, so password managers usually accept the fingerprint only. ' +
         'Face ID is an Apple feature and does not exist on Samsung phones.</p>') +
 
-      sec(4, 'Check your balance', ol([
+      sec(5, 'Check your balance', ol([
         'Open the <b>Home</b> tab in the bottom bar.',
         'Under <b>Accounts</b> the first card is <b>Bank Portfolio</b>: <b>Total balance</b> on top, <b>Your available balance</b> below.',
         'Swipe the card to the left to see the account itself.',
@@ -624,14 +643,14 @@
         'Tap a card to open the account: balance, account number, branch code and SWIFT.'
       ])) +
 
-      sec(5, 'Look through your transactions', ol([
+      sec(6, 'Look through your transactions', ol([
         'Open the <b>Transact</b> tab. Newest operations are on top, grouped by day.',
         'The first row of chips filters by month, the second by card (<b>***2740</b> or <b>***9441</b>).',
         '<b>Money in</b> and <b>Money out</b> above the list recalculate for whatever you selected.',
         'Tap any operation to see the details: card, category, date and time, type, reference and the balance after it.'
       ])) +
 
-      sec(6, 'Find one specific transaction', 
+      sec(7, 'Find one specific transaction', 
         '<p>Example: the incoming SWIFT transfer from August.</p>' + ol([
         'Open the <b>Transact</b> tab and tap <b>Search transactions</b>.',
         'Type <b>SWIFT</b> — the list narrows down to incoming transfers.',
@@ -640,7 +659,7 @@
         'Search also accepts a reference number or a category name, for example <b>Income</b>.'
       ]) + '<p class="guide__note">If you know the month, tap its chip first — the list gets shorter and the search is faster.</p>') +
 
-      sec(7, 'Create a statement', ol([
+      sec(8, 'Create a statement', ol([
         'Open <b>More → Statements</b>. The same screen is one tap away from <b>Home → Statement</b>.',
         'Tap <b>Order a statement</b>.',
         '<b>Period</b>: <b>Last month</b>, <b>3 months</b> (three full calendar months) or <b>Custom</b>.',
@@ -1394,6 +1413,51 @@
     'sheet-close': closeSheet
   };
 
+  /* ---------------------------------------------------------------- 16b. Автоблокировка */
+  var idleTimer = null, awayAt = 0;
+  var privacyEl = document.getElementById('privacy');
+
+  function privacy(on) {
+    if (privacyEl) privacyEl.hidden = !on;
+  }
+
+  function resetIdle() {
+    clearTimeout(idleTimer);
+    if (!S.authed) return;
+    idleTimer = setTimeout(function () { lockSession('idle'); }, LOCK_IDLE * 1000);
+  }
+
+  function lockSession(reason) {
+    if (!S.authed) return;
+    S.authed = false;
+    S.stack = [];
+    clearTimeout(idleTimer);
+    try { localStorage.removeItem(SEEN_KEY); } catch (e) { /* приватный режим */ }
+    save();
+    go('login', {}, 'fade');
+    setTimeout(function () {
+      toast(reason === 'idle'
+        ? 'Session timed out. Please log in again.'
+        : 'You left the app, so it locked. Please log in again.');
+    }, 340);
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      awayAt = Date.now();
+      if (S.authed) { save(); privacy(true); }
+      clearTimeout(idleTimer);
+    } else {
+      privacy(false);
+      if (S.authed && awayAt && Date.now() - awayAt > LOCK_AWAY * 1000) lockSession('away');
+      else resetIdle();
+    }
+  });
+
+  ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) {
+    document.addEventListener(ev, resetIdle, { passive: true });
+  });
+
   /* ---------------------------------------------------------------- 17. Delegation */
   document.addEventListener('click', function (e) {
     var el = e.target.closest('[data-action]');
@@ -1410,9 +1474,20 @@
 
   /* ---------------------------------------------------------------- 18. Boot */
   load();
+
+  // приложение закрывали дольше, чем на LOCK_AWAY, — просим войти заново
+  var lockedOnBoot = false;
+  if (S.authed) {
+    var seen = 0;
+    try { seen = +(localStorage.getItem(SEEN_KEY) || 0); } catch (e) { /* приватный режим */ }
+    if (!seen || Date.now() - seen > LOCK_AWAY * 1000) { S.authed = false; lockedOnBoot = true; }
+  }
+
   S.order = defaultOrder();
   S.screen = S.authed ? 'home' : 'login';
   paint('none');
+  resetIdle();
+  if (lockedOnBoot) setTimeout(function () { toast('Session closed for your security. Please log in again.'); }, 500);
 
   var clock = $('#clock');
   function tick() {
