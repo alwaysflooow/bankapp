@@ -10,6 +10,6 @@
   "theme_color": "#ffffff",
   "lang": "en",
   "icons": [
-    { "src": "icons/app-icon.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "icons/app-icon.png?v=3", "sizes": "512x512", "type": "image/png" }
   ]
 }
